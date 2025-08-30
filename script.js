@@ -87,7 +87,7 @@ function initSliders() {
         <h4>${character.name}</h4>
         <p>${character.desc}</p>
         ${currentPackage === 'custom' ? `<p class="price-tag">${character.price}₽</p>` : ''}
-        <button class="view-btn" data-video="${character.video}" data-name="${character.name}">Посмотреть</button>
+        
       </div>
     `;
     
@@ -109,7 +109,7 @@ function initSliders() {
         <h4>${show.name}</h4>
         <p>${show.desc}</p>
         ${currentPackage === 'custom' ? `<p class="price-tag">${show.price}₽</p>` : ''}
-        <button class="view-btn" data-video="${show.video}" data-name="${show.name}">Посмотреть</button>
+        
       </div>
     `;
     
