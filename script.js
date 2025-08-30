@@ -1,18 +1,18 @@
 const API_BASE_URL = '/api';
 
 const charactersData = [
-  { name: "Человек-Паук", desc: "Любимый супергерой детей", image: "images/человек паук новый.PNG", price: 5000, video: "videos/spiderman.mp4" },
-  { name: "Железный Человек", desc: "Гений, миллиардер, плейбой, филантроп", image: "images/железный человек.PNG", price: 6000, video: "videos/ironman.mp4" },
-  { name: "Бэтгерл", desc: "Отважная героиня Готэма", image: "images/batgerl.PNG", price: 5500, video: "videos/batgirl.mp4" },
-  { name: "Пьеро", desc: "Грустный персонаж итальянской комедии", image: "images/IMG_1662.PNG", price: 4500, video: "videos/piero.mp4" },
-  { name: "Эльза", desc: "Снежная королева из Холодного сердца", image: "images/эльза.PNG", price: 6500, video: "videos/elsa.mp4" },
-  { name: "Пират", desc: "Отважный морской разбойник", image: "images/пират.PNG", price: 5000, video: "videos/pirate.mp4" },
-  { name: "Гарри Поттер", desc: "Юный волшебник из Хогвартса", image: "images/гарри поттер.PNG", price: 6000, video: "videos/harrypotter.mp4" },
-  { name: "Черепашки ниндзя", desc: "Четверка героев-мутантов", image: "images/черепашки ниндзя.PNG", price: 8000, video: "videos/tmnt.mp4" },
-  { name: "Русалочка", desc: "Морская принцесса", image: "images/русалочка.PNG", price: 5500, video: "videos/mermaid.mp4" },
-  { name: "Лего Ниндзяго", desc: "Ниндзя из мира Лего", image: "images/лего ниндзяго.PNG", price: 5500, video: "videos/ninjago.mp4" },
-  { name: "Белоснежка", desc: "Самая добрая принцесса", image: "images/белоснежка.PNG", price: 5500, video: "videos/snowwhite.mp4" },
-  { name: "Лунтик", desc: "Добрый пришелец с Луны", image: "images/лунтик.PNG", price: 5000, video: "videos/luntik.mp4" }
+  { name: "Капитан Америка", desc: "Капитан Бургера", image: "images/amurika.PNG", price: 5000, video: "videos/spiderman.mp4" },
+  { name: "Железный Человек", desc: "Гений, миллиардер, плейбой, филантроп", image: "images/tonysrark.PNG", price: 6000, video: "videos/ironman.mp4" },
+  { name: "Бэтгерл", desc: "Отважная героиня Готэма", image: "images/batgerrl.PNG", price: 5500, video: "videos/batgirl.mp4" },
+  { name: "Майнкрафт", desc: "Тюринг полная игра", image: "images/minicraftblyat.PNG", price: 4500, video: "videos/piero.mp4" },
+  { name: "Пьеро", desc: "Дед инсайд с ссср", image: "images/piero.PNG", price: 6500, video: "videos/elsa.mp4" },
+  { name: "Футболист", desc: "Отец роналдо", image: "images/ronaldo.PNG", price: 5000, video: "videos/pirate.mp4" },
+  { name: "Гарри Поттер", desc: "Юный волшебник из Хогвартса", image: "images/garypotter.PNG", price: 6000, video: "videos/harrypotter.mp4" },
+  { name: "Шрек", desc: "Кто проживает на дне болота", image: "images/shrek.PNG", price: 8000, video: "videos/tmnt.mp4" },
+  { name: "Супермен", desc: "Лунтик в плаще", image: "images/superpidor.PNG", price: 5500, video: "videos/mermaid.mp4" },
+  { name: "Фредди Фазбер", desc: "Поиграй с медведем", image: "images/fredybazbearholhoholhoohohhool.PNG", price: 5500, video: "videos/ninjago.mp4" },
+  { name: "Белоснежка", desc: "Самая добрая принцесса", image: "images/belosnezhka.PNG", price: 5500, video: "videos/snowwhite.mp4" },
+  { name: "Халк", desc: "Зеленный качок", image: "images/Halk.PNG", price: 5000, video: "videos/luntik.mp4" }
 ];
 
 const showsData = [
