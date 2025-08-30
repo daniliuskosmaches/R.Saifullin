@@ -1183,7 +1183,7 @@ h2:after {
   padding-left: 35px;
   cursor: pointer;
   font-size: 1rem;
-  color: var(--bg-color);
+  color: #e9dada;
   user-select: none;
 }
 
