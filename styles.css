@@ -565,7 +565,7 @@ h2:after {
 .total-price {
   font-size: 1.5rem;
   font-weight: bold;
-  color: var(--highlight);
+  color: #070a0c;
 }
 
 .selection-section {
