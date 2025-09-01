@@ -86,7 +86,7 @@ const showsData = [
     price: "2200 AED",
     age: "5-15 лет",
     duration: "60 минут",
-    video: "videos/foam-party.mov"
+    video: "videos/Foam.mp4"
   },
   {
     name: "Магическое шоу",
@@ -94,7 +94,7 @@ const showsData = [
     price: "1400 AED",
     age: "4-7 лет",
     duration: "30 минут",
-    video: "videos/magic-show.mov"
+    video: "videos/Magic.mp4"
   },
   {
     name: "Сумасшедшая коробка с животными",
@@ -102,7 +102,7 @@ const showsData = [
     price: "1900 AED",
     age: "5+",
     duration: "40 минут",
-    video: "videos/crazy-box.mov"
+    video: "videos/Crazy.mp4"
   },
   {
     name: "Мафия для детей и подростков",
@@ -110,7 +110,7 @@ const showsData = [
     price: "700 AED",
     age: "6+",
     duration: "60 минут",
-    video: "videos/mafia-kids.mov"
+    video: "videos/teen.mp4"
   },
   {
     name: "Мафия для взрослых",
@@ -126,7 +126,7 @@ const showsData = [
     price: "700 AED",
     age: "12-18 лет",
     duration: "60 минут",
-    video: "videos/teen-host.mov"
+    video: "videos/"
   }
 ];
 
