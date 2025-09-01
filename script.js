@@ -22,7 +22,7 @@ const showsData = [
     price: "1400 AED",
     age: "2-7 лет",
     duration: "30 минут",
-    video: "videos/bubble-show.mov"
+    video: "videos/Foam.mp4"
   },
   {
     name: "Неоновое шоу пузырей",
@@ -30,7 +30,7 @@ const showsData = [
     price: "1800 AED",
     age: "5-12 лет",
     duration: "30 минут",
-    video: "videos/neon-bubble-show.mov"
+    video: "videos/Bubble.mp4"
   },
   {
     name: "Химическое шоу",
@@ -38,7 +38,7 @@ const showsData = [
     price: "1400 AED",
     age: "5-15 лет",
     duration: "30 минут",
-    video: "videos/chemistry-show.mov"
+    video: "videos/Chemical.mp4"
   },
   {
     name: "Тесла шоу",
@@ -46,7 +46,7 @@ const showsData = [
     price: "1400 AED",
     age: "6-15 лет",
     duration: "30 минут",
-    video: "videos/tesla-show.mov"
+    video: "videos/Tesla.mp4"
   },
   {
     name: "Бумажное шоу",
@@ -54,7 +54,7 @@ const showsData = [
     price: "2000 AED",
     age: "5-9 лет",
     duration: "30 минут",
-    video: "videos/paper-show.mov"
+    video: "videos/Paper.mp4"
   },
   {
     name: "Крио-шоу с мороженым",
@@ -62,7 +62,7 @@ const showsData = [
     price: "1800 AED",
     age: "5-15 лет",
     duration: "45 минут",
-    video: "videos/cryo-show.mov"
+    video: "videos/Icecream.mp4"
   },
   {
     name: "Слайм шоу-мастерская",
@@ -78,7 +78,7 @@ const showsData = [
     price: "1200 AED (до 10 детей)",
     age: "5-10 лет",
     duration: "30-45 минут",
-    video: "videos/notebook-workshop.mov"
+    video: "videos/Notebook.mp4"
   },
   {
     name: "Пенная вечеринка",
@@ -110,7 +110,7 @@ const showsData = [
     price: "700 AED",
     age: "6+",
     duration: "60 минут",
-    video: "videos/teen.mp4"
+    video: "videos/Mafia.mp4"
   },
   {
     name: "Мафия для взрослых",
@@ -118,7 +118,7 @@ const showsData = [
     price: "900 AED",
     age: "16+",
     duration: "60 минут",
-    video: "videos/mafia-adults.mov"
+    video: "videos/MagicAdults.mp4"
   },
   {
     name: "Ведущий для подростков",
@@ -126,7 +126,7 @@ const showsData = [
     price: "700 AED",
     age: "12-18 лет",
     duration: "60 минут",
-    video: "videos/"
+    video: "videos/teen.mp4"
   }
 ];
 
