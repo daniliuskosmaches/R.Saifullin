@@ -71,7 +71,47 @@ app.use(helmet({
 app.use(cors());
 app.use(express.json({ limit: '10kb' }));
 
-// Безопасная раздача статических файлов
+// Сначала блокируем доступ к серверным файлам
+app.get([
+  '/app.js',
+  '/server.js', 
+  '/package.json', 
+  '/package-lock.json', 
+  '/node_modules/*',
+  '/.env',
+  '/.git/*',
+  '/data.json',
+  '/.gitignore',
+  '/README.md'
+], (req, res) => {
+  console.log('Blocked access to server file:', req.path);
+  res.status(404).send('Not found');
+});
+
+// Блокировка .js файлов кроме разрешенных папок
+app.get('*.js', (req, res, next) => {
+  // Разрешаем только js файлы в определенных папках
+  if (req.path.startsWith('/js/') || 
+      req.path.startsWith('/scripts/') || 
+      req.path.startsWith('/vendor/') ||
+      req.path.startsWith('/assets/') ||
+      req.path.startsWith('/static/')) {
+    next();
+  } else {
+    console.log('Blocked JS file access:', req.path);
+    res.status(404).send('Not found');
+  }
+});
+
+// Лимитер запросов для API
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Too many requests, please try again later'
+});
+app.use('/api/', apiLimiter);
+
+// Только после блокировки серверных файлов - безопасная раздача статических файлов
 app.use(express.static(__dirname, {
   setHeaders: (res, filePath) => {
     const ext = path.extname(filePath).toLowerCase();
@@ -105,39 +145,6 @@ app.use(express.static(__dirname, {
     }
   }
 }));
-
-// Блокировка доступа к серверным файлам
-app.get([
-  '/app.js',
-  '/server.js', 
-  '/package.json', 
-  '/package-lock.json', 
-  '/node_modules/*',
-  '/.env',
-  '/.git/*',
-  '/data.json'
-], (req, res) => {
-  console.log('Blocked access to server file:', req.path);
-  res.status(404).send('Not found');
-});
-
-// Блокировка .js файлов кроме разрешенных папок
-app.get('*.js', (req, res, next) => {
-  if (req.path.startsWith('/js/') || req.path.startsWith('/scripts/') || req.path.startsWith('/vendor/')) {
-    next();
-  } else {
-    console.log('Blocked JS file access:', req.path);
-    res.status(404).send('Not found');
-  }
-});
-
-// Лимитер запросов для API
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: 'Too many requests, please try again later'
-});
-app.use('/api/', apiLimiter);
 
 // Функции для работы с ценами
 function createPriceSignature(productId, price, type = 'character') {
@@ -482,7 +489,7 @@ process.on('unhandledRejection', (reason, promise) => {
   process.exit(1);
 });
 
-// Обслуживание фронтенда
+// Обслуживание фронтенда - ДОЛЖНО БЫТЬ ПОСЛЕДНИМ
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
