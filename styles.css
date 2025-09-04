@@ -1233,20 +1233,26 @@ h2:after {
   opacity: 1;
 }
 
-.view-product-btn {
-  background: transparent;
-  color: white;
-  border: 1px solid white;
+.add-product-btn {
+  background: var(--accent-color);
+  color: var(--bg-color);
+  border: none;
   padding: 10px 20px;
   border-radius: 20px;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  display: block;
+  width: 100%;
+  text-align: center;
 }
 
-.view-product-btn:hover {
-  background: white;
-  color: var(--bg-color);
-  transform: scale(1.05);
+.add-product-btn:hover {
+  background: var(--highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
 .product-info {
@@ -1716,22 +1722,27 @@ h2:after {
   .character-card,
   .show-card,
   .master-card {
-    width: 180px;    /* Было 280px */
-    height: 240px;   /* Было 380px */
-    margin: 0;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin: 0 0 20px 0;
     scroll-snap-align: center;
     flex: 0 0 auto;
     border-radius: 12px;
-    padding: 12px;   /* Было 20px */
+    padding: 16px;
     background: rgba(214, 196, 155, 0.1);
     border: 1px solid var(--accent-color);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .character-card img,
   .show-card img {
-    width: 90px;     /* Было 150px */
+    width: 90px;
     height: 90px;
-    margin-bottom: 12px; /* Было 20px */
+    margin-bottom: 12px;
   }
 
   .master-card .master-icon {
@@ -1753,60 +1764,16 @@ h2:after {
     pointer-events: auto;
   }
 
-  .reviews-slider {
-    padding: 0 15px;
-    margin: 0 -15px;
-    width: calc(100% + 30px);
+  .products-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
 
-  .review-card {
-    min-width: 280px;
-    max-width: 280px;
-    padding: 15px;
-  }
-
-  .review-author {
-    font-size: 1rem;
-  }
-
-  .review-text {
-    font-size: 0.9rem;
-  }
-
-  .consultation-form {
-    padding: 20px;
-  }
-
-  .form-title {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-  }
-
-  .contact-vertical-container {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .contact-column {
+  .product-card {
     width: 100%;
-  }
-
-  .modal-content {
-    max-width: 95%;
-    padding: 20px;
-  }
-
-  .video-modal {
-    width: 95%;
-  }
-
-  .mobile-menu {
-    top: 50px;
-  }
-
-  .nav-button {
-    height: 36px;
-    font-size: 14px;
+    max-width: 100%;
+    margin: 0 0 20px 0;
+    box-sizing: border-box;
   }
 }
 
@@ -1818,4 +1785,27 @@ h2:after {
   .mobile-menu-btn {
     display: none;
   }
+}
+
+.add-product-btn {
+  background: var(--accent-color);
+  color: var(--bg-color);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 15px;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.add-product-btn:hover {
+  background: var(--highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }

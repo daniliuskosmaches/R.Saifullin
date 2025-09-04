@@ -436,6 +436,8 @@ let currentPackage = null;
 let selectedCharacters = [];
 let selectedShows = [];
 let selectedMasterClasses = [];
+let selectedProducts = [];
+let selectedAdditionalServices = [];
 let maxCharacters = 0;
 let maxShows = 0;
 let maxMasterClasses = 0;
@@ -451,6 +453,8 @@ document.addEventListener('DOMContentLoaded', function() {
   initPhoneMask();
   initModalClose();
   initIntersectionObserver();
+  initProductButtons();
+  initAdditionalServiceCheckboxes();
 });
 
 function initIntersectionObserver() {
@@ -581,6 +585,8 @@ function initPackageSelection() {
       selectedCharacters = [];
       selectedShows = [];
       selectedMasterClasses = [];
+      selectedProducts = [];
+      selectedAdditionalServices = [];
       
       document.getElementById('selected-package-name').textContent = getPackageName(currentPackage);
       document.getElementById('max-characters').textContent = maxCharacters;
@@ -705,6 +711,8 @@ function initFormValidation() {
           characters: selectedCharacters,
           shows: selectedShows,
           masterClasses: selectedMasterClasses,
+          products: selectedProducts,
+          additionalServices: selectedAdditionalServices,
           total: document.getElementById('total-price').textContent
         };
 
@@ -742,6 +750,8 @@ function resetSelection() {
   selectedCharacters = [];
   selectedShows = [];
   selectedMasterClasses = [];
+  selectedProducts = [];
+  selectedAdditionalServices = [];
   document.getElementById('package-selection').classList.remove('active');
   document.getElementById('form-selected-services').innerHTML = '';
   document.querySelectorAll('.character-card, .show-card, .master-card').forEach(card => {
@@ -804,7 +814,6 @@ function updateSelection() {
   document.getElementById('characters-count').textContent = selectedCharacters.length;
   document.getElementById('shows-count').textContent = selectedShows.length;
   document.getElementById('master-count').textContent = selectedMasterClasses.length;
-  
   updateSelectedServicesPreview();
   updateTotalPrice();
 }
@@ -828,30 +837,70 @@ function showVideoModal(videoUrl, title) {
   });
 }
 
+function initProductButtons() {
+  document.querySelectorAll('.product-card .add-product-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const card = this.closest('.product-card');
+      const name = card.dataset.name;
+      const price = parseInt(card.dataset.price, 10);
+      const id = card.dataset.product;
+      if (!selectedProducts.some(p => p.id === id)) {
+        selectedProducts.push({ id, name, price });
+        showNotification(`Товар "${name}" добавлен`, 'success');
+        updateSelection();
+      }
+    });
+  });
+}
+
+function initAdditionalServiceCheckboxes() {
+  document.querySelectorAll('.additional-service').forEach(chk => {
+    chk.addEventListener('change', function() {
+      const name = this.dataset.name;
+      const price = parseInt(this.dataset.price, 10);
+      const id = this.dataset.type;
+      if (this.checked) {
+        if (!selectedAdditionalServices.some(s => s.id === id)) {
+          selectedAdditionalServices.push({ id, name, price });
+        }
+      } else {
+        selectedAdditionalServices = selectedAdditionalServices.filter(s => s.id !== id);
+      }
+      updateSelection();
+    });
+  });
+}
+
 function updateFormSelectedServices() {
   const formServices = document.getElementById('form-selected-services');
   let html = '<h4>Выбранные услуги:</h4><div class="selected-items">';
-  
   html += `<div class="selected-item">Пакет: ${getPackageName(currentPackage)} <span>${document.getElementById('total-price').textContent}₽</span></div>`;
-  
   if (selectedCharacters.length > 0) {
     selectedCharacters.forEach(char => {
       html += `<div class="selected-item">${char.name} <span>${char.price}₽</span></div>`;
     });
   }
-  
   if (selectedShows.length > 0) {
     selectedShows.forEach(show => {
       html += `<div class="selected-item">${show.name} <span>${show.price}₽</span></div>`;
     });
   }
-  
   if (selectedMasterClasses.length > 0) {
     selectedMasterClasses.forEach(master => {
       html += `<div class="selected-item">${master.name} <span>${master.price}₽</span></div>`;
     });
   }
-  
+  if (selectedProducts.length > 0) {
+    selectedProducts.forEach(prod => {
+      html += `<div class="selected-item">${prod.name} <span>${prod.price}₽</span></div>`;
+    });
+  }
+  if (selectedAdditionalServices.length > 0) {
+    selectedAdditionalServices.forEach(serv => {
+      html += `<div class="selected-item">${serv.name} <span>${serv.price}₽</span></div>`;
+    });
+  }
   html += '</div>';
   formServices.innerHTML = html;
 }
@@ -897,6 +946,26 @@ function updateSelectedServicesPreview() {
     </div>`;
   });
   
+  selectedProducts.forEach(prod => {
+    html += `<div class="selected-item-card">
+      <div class="selected-item-img" style="background: rgba(214, 196, 155, 0.2); display: flex; align-items: center; justify-content: center;">
+        <span style="font-size: 2rem;">🎁</span>
+      </div>
+      <div class="selected-item-name">${prod.name}</div>
+      <div class="remove-item-btn" onclick="removeSelectedItem('product', '${prod.id}')">×</div>
+    </div>`;
+  });
+  
+  selectedAdditionalServices.forEach(serv => {
+    html += `<div class="selected-item-card">
+      <div class="selected-item-img" style="background: rgba(214, 196, 155, 0.2); display: flex; align-items: center; justify-content: center;">
+        <span style="font-size: 2rem;">🍰</span>
+      </div>
+      <div class="selected-item-name">${serv.name}</div>
+      <div class="remove-item-btn" onclick="removeSelectedItem('additional', '${serv.id}')">×</div>
+    </div>`;
+  });
+  
   html += '</div>';
   preview.innerHTML = html;
   
@@ -905,7 +974,10 @@ function updateSelectedServicesPreview() {
     selectedCharacters = [];
     selectedShows = [];
     selectedMasterClasses = [];
+    selectedProducts = [];
+    selectedAdditionalServices = [];
     document.getElementById('package-selection').classList.remove('active');
+    document.querySelectorAll('.additional-service').forEach(chk => chk.checked = false);
     updateSelection();
   };
   
@@ -919,6 +991,11 @@ function updateSelectedServicesPreview() {
     } else if (type === 'master') {
       const index = selectedMasterClasses.findIndex(m => m.name === name);
       if (index !== -1) selectedMasterClasses.splice(index, 1);
+    } else if (type === 'product') {
+      selectedProducts = selectedProducts.filter(p => p.id !== name);
+    } else if (type === 'additional') {
+      selectedAdditionalServices = selectedAdditionalServices.filter(s => s.id !== name);
+      document.querySelectorAll(`.additional-service[data-type="${name}"]`).forEach(chk => chk.checked = false);
     }
     updateSelection();
   };
@@ -926,16 +1003,17 @@ function updateSelectedServicesPreview() {
 
 function updateTotalPrice() {
   const totalPriceElement = document.getElementById('total-price');
-  
+  let total = 0;
   if (currentPackage === 'custom') {
-    let total = 0;
     selectedCharacters.forEach(c => total += c.price);
     selectedShows.forEach(s => total += s.price);
     selectedMasterClasses.forEach(m => total += m.price);
-    totalPriceElement.textContent = total.toLocaleString('ru-RU');
   } else {
-    totalPriceElement.textContent = basePrice.toLocaleString('ru-RU');
+    total = basePrice;
   }
+  selectedProducts.forEach(p => total += p.price);
+  selectedAdditionalServices.forEach(s => total += s.price);
+  totalPriceElement.textContent = total.toLocaleString('ru-RU');
 }
 
 function getPackageName(packageType) {
@@ -957,18 +1035,6 @@ function initGalleryButtons() {
       if (videoUrl) {
         showVideoModal(videoUrl, title);
       }
-    }
-    
-    const viewCaseBtn = e.target.closest('.view-case-btn');
-    if (viewCaseBtn) {
-      const caseIndex = Array.from(document.querySelectorAll('.view-case-btn')).indexOf(viewCaseBtn);
-      showCaseModal(caseIndex);
-    }
-    
-    const viewProductBtn = e.target.closest('.view-product-btn');
-    if (viewProductBtn) {
-      const productIndex = Array.from(document.querySelectorAll('.view-product-btn')).indexOf(viewProductBtn);
-      showProductModal(productIndex);
     }
   });
 }
@@ -1040,3 +1106,5 @@ function showProductModal(index) {
   // Реализация показа модального окна с продуктами
   console.log('Показать продукт', index);
 }
+
+// Чекбоксы "Тортик", "Пиньята", "Фотограф" уже добавляются в пакет услуг через selectedAdditionalServices

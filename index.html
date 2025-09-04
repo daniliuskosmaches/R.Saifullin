@@ -184,11 +184,7 @@
       <div class="cases-grid">
         <div class="case-card">
           <div class="case-image-container">
-            <!-- Замените на ваши изображения -->
             <img src="case1.jpg" alt="Детский день рождения" loading="lazy">
-            <div class="case-overlay">
-              <button class="view-case-btn">Подробнее</button>
-            </div>
           </div>
           <div class="case-info">
             <h3>День рождения Алисы</h3>
@@ -198,9 +194,6 @@
         <div class="case-card">
           <div class="case-image-container">
             <img src="case2.jpg" alt="Выпускной в детском саду" loading="lazy">
-            <div class="case-overlay">
-              <button class="view-case-btn">Подробнее</button>
-            </div>
           </div>
           <div class="case-info">
             <h3>Выпускной в детском саду</h3>
@@ -210,9 +203,6 @@
         <div class="case-card">
           <div class="case-image-container">
             <img src="case3.jpg" alt="Новый год" loading="lazy">
-            <div class="case-overlay">
-              <button class="view-case-btn">Подробнее</button>
-            </div>
           </div>
           <div class="case-info">
             <h3>Корпоративный Новый год</h3>
@@ -267,34 +257,33 @@
       <h2>Дополнительные товары</h2>
       <p class="subtitle">Что еще может украсить ваш праздник</p>
       <div class="products-grid">
-        <div class="product-card">
+        <div class="product-card" data-product="pinata" data-name="Пиньята" data-price="1500">
           <div class="product-image-container">
-            <!-- Замените на ваши изображения -->
             <img src="pinata1.jpg" alt="Пиньята" loading="lazy">
             <div class="product-overlay">
-              <button class="view-product-btn">Подробнее</button>
+              <button class="add-product-btn">Добавить</button>
             </div>
           </div>
           <h3>Пиньяты</h3>
           <p>Яркие пиньяты с конфетами и подарками</p>
           <div class="product-price">от 1 500 ₽</div>
         </div>
-        <div class="product-card">
+        <div class="product-card" data-product="decor" data-name="Оформление шарами" data-price="3000">
           <div class="product-image-container">
             <img src="decor.jpg" alt="Оформление шарами" loading="lazy">
             <div class="product-overlay">
-              <button class="view-product-btn">Подробнее</button>
+              <button class="add-product-btn">Добавить</button>
             </div>
           </div>
           <h3>Оформление шарами</h3>
           <p>Тематическое оформление праздника</p>
           <div class="product-price">от 3 000 ₽</div>
         </div>
-        <div class="product-card">
+        <div class="product-card" data-product="photo" data-name="Фотосессия" data-price="5000">
           <div class="product-image-container">
             <img src="photo.jpg" alt="Фотосессия" loading="lazy">
             <div class="product-overlay">
-              <button class="view-product-btn">Подробнее</button>
+              <button class="add-product-btn">Добавить</button>
             </div>
           </div>
           <h3>Фотосессия</h3>
@@ -302,20 +291,19 @@
           <div class="product-price">5 000 ₽</div>
         </div>
       </div>
-      
       <div class="product-checkbox-container">
         <label class="product-checkbox">
-          <input type="checkbox" class="additional-service" data-type="cake" data-price="3000">
+          <input type="checkbox" class="additional-service" data-type="cake" data-name="Тортик" data-price="3000">
           <span class="checkmark"></span>
           Тортик (+3000₽)
         </label>
         <label class="product-checkbox">
-          <input type="checkbox" class="additional-service" data-type="photographer" data-price="5000">
+          <input type="checkbox" class="additional-service" data-type="photographer" data-name="Фотограф" data-price="5000">
           <span class="checkmark"></span>
           Фотограф (+5000₽)
         </label>
         <label class="product-checkbox">
-          <input type="checkbox" class="additional-service" data-type="pinata" data-price="1500">
+          <input type="checkbox" class="additional-service" data-type="pinata" data-name="Пиньята" data-price="1500">
           <span class="checkmark"></span>
           Пиньята (+1500₽)
         </label>
