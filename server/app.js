@@ -71,73 +71,27 @@ app.use(helmet({
 app.use(cors());
 app.use(express.json({ limit: '10kb' }));
 
-// Безопасная раздача статических файлов
+// Статические файлы (CSS, JS, изображения, видео)
 app.use(express.static(__dirname, {
   setHeaders: (res, filePath) => {
-    const ext = path.extname(filePath).toLowerCase();
-    const allowedExtensions = ['.html', '.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.mp4', '.webm', '.svg', '.woff', '.woff2', '.ttf', '.eot'];
-    
-    if (!allowedExtensions.includes(ext)) {
-      res.status(404).end();
-      return;
-    }
-
-    // Устанавливаем правильные Content-Type
-    const mimeTypes = {
-      '.css': 'text/css',
-      '.js': 'application/javascript',
-      '.png': 'image/png',
-      '.jpg': 'image/jpeg',
-      '.jpeg': 'image/jpeg',
-      '.gif': 'image/gif',
-      '.ico': 'image/x-icon',
-      '.mp4': 'video/mp4',
-      '.webm': 'video/webm',
-      '.svg': 'image/svg+xml',
-      '.woff': 'font/woff',
-      '.woff2': 'font/woff2',
-      '.ttf': 'font/ttf',
-      '.eot': 'application/vnd.ms-fontobject'
-    };
-
-    if (mimeTypes[ext]) {
-      res.setHeader('Content-Type', mimeTypes[ext]);
+    if (filePath.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    } else if (filePath.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    } else if (filePath.endsWith('.png') || filePath.endsWith('.jpg') || filePath.endsWith('.jpeg')) {
+      res.setHeader('Content-Type', 'image/jpeg');
+    } else if (filePath.endsWith('.mp4')) {
+      res.setHeader('Content-Type', 'video/mp4');
     }
   }
 }));
 
-// Блокировка доступа к серверным файлам
-app.get([
-  '/app.js',
-  '/server.js', 
-  '/package.json', 
-  '/package-lock.json', 
-  '/node_modules/*',
-  '/.env',
-  '/.git/*',
-  '/data.json'
-], (req, res) => {
-  console.log('Blocked access to server file:', req.path);
-  res.status(404).send('Not found');
-});
-
-// Блокировка .js файлов кроме разрешенных папок
-app.get('*.js', (req, res, next) => {
-  if (req.path.startsWith('/js/') || req.path.startsWith('/scripts/') || req.path.startsWith('/vendor/')) {
-    next();
-  } else {
-    console.log('Blocked JS file access:', req.path);
-    res.status(404).send('Not found');
-  }
-});
-
 // Лимитер запросов для API
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+app.use('/api/', rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 минут
   max: 100,
   message: 'Too many requests, please try again later'
-});
-app.use('/api/', apiLimiter);
+}));
 
 // Функции для работы с ценами
 function createPriceSignature(productId, price, type = 'character') {
@@ -179,41 +133,6 @@ function getRealPrice(productId, type = 'character') {
   }
   return data ? data.price : 0;
 }
-
-// Данные для фронтенда
-const charactersData = [
-  { id: 1, name: "Человек-Паук", desc: "Любимый супергерой детей", image: "/images/человек паук новый.PNG", price: 5000, video: "/videos/spiderman.mp4" },
-  { id: 2, name: "Железный Человек", desc: "Гений, миллиардер, плейбой, филантроп", image: "/images/железный человек.PNG", price: 6000, video: "/videos/ironman.mp4" },
-  { id: 3, name: "Бэтгерл", desc: "Отважная героиня Готэма", image: "/images/batgerl.PNG", price: 5500, video: "/videos/batgirl.mp4" },
-  { id: 4, name: "Пьеро", desc: "Грустный персонаж итальянской комедии", image: "/images/IMG_1662.PNG", price: 4500, video: "/videos/piero.mp4" },
-  { id: 5, name: "Эльза", desc: "Снежная королева из Холодного сердца", image: "/images/эльза.PNG", price: 6500, video: "/videos/elsa.mp4" },
-  { id: 6, name: "Пират", desc: "Отважный морской разбойник", image: "/images/пират.PNG", price: 5000, video: "/videos/pirate.mp4" },
-  { id: 7, name: "Гарри Поттер", desc: "Юный волшебник из Хогвартса", image: "/images/гарри поттер.PNG", price: 6000, video: "/videos/harrypotter.mp4" },
-  { id: 8, name: "Черепашки ниндзя", desc: "Четверка героев-мутантов", image: "/images/черепашки ниндзя.PNG", price: 8000, video: "/videos/tmnt.mp4" },
-  { id: 9, name: "Русалочка", desc: "Морская принцесса", image: "/images/русалочка.PNG", price: 5500, video: "/videos/mermaid.mp4" },
-  { id: 10, name: "Лего Ниндзяго", desc: "Ниндзя из мира Леgo", image: "/images/лего ниндзяго.PNG", price: 5500, video: "/videos/ninjago.mp4" },
-  { id: 11, name: "Белоснежка", desc: "Самая добрая принцесса", image: "/images/белоснежка.PNG", price: 5500, video: "/videos/snowwhite.mp4" },
-  { id: 12, name: "Лунтик", desc: "Добрый пришелец с Луны", image: "/images/лунтик.PNG", price: 5000, video: "/videos/luntik.mp4" }
-];
-
-const showsData = [
-  { id: 1, name: "Химическое Шоу", desc: "Удивительные эксперименты с жидким азотом", image: "/images/chemistry.jpeg", price: 10000, video: "/videos/chemistry-show.mp4" },
-  { id: 2, name: "Бумажное Шоу", desc: "Музыка, танцы и море бумаги", image: "/images/paper.jpeg", price: 12000, video: "/videos/paper-show.mp4" },
-  { id: 3, name: "Шоу Пузырей", desc: "Волшебный мир огромных мыльных пузырей", image: "/images/bubble.jpeg", price: 8000, video: "/videos/bubble-show.mp4" },
-  { id: 4, name: "Шоу магии", desc: "Волшебное шоу для детей", image: "/images/majic.jpeg", price: 8000, video: "/videos/magic-show.mp4" }
-];
-
-const masterClassesData = [
-  { id: 1, name: "Создание костюмов", desc: "Научитесь создавать костюмы своими руками", price: 2500, icon: "✂️" },
-  { id: 2, name: "Актерское мастерство", desc: "Основы перевоплощения в персонажей", price: 3000, icon: "🎭" },
-  { id: 3, name: "Грим и макияж", desc: "Профессиональные техники грима", price: 2800, icon: "🎨" }
-];
-
-const additionalServices = [
-  { id: 1, name: "Тортик", price: 3000 },
-  { id: 2, name: "Фотограф", price: 5000 },
-  { id: 3, name: "Пиньята", price: 1500 }
-];
 
 // API: Получение данных для фронтенда с подписанными ценами
 app.get('/api/init-data', (req, res) => {
@@ -449,6 +368,46 @@ app.get('/api/bookings', (req, res) => {
   });
 });
 
+// Данные для фронтенда
+const charactersData = [
+  { id: 1, name: "Человек-Паук", desc: "Любимый супергерой детей", image: "/images/человек паук новый.PNG", price: 5000, video: "/videos/spiderman.mp4" },
+  { id: 2, name: "Железный Человек", desc: "Гений, миллиардер, плейбой, филантроп", image: "/images/железный человек.PNG", price: 6000, video: "/videos/ironman.mp4" },
+  { id: 3, name: "Бэтгерл", desc: "Отважная героиня Готэма", image: "/images/batgerl.PNG", price: 5500, video: "/videos/batgirl.mp4" },
+  { id: 4, name: "Пьеро", desc: "Грустный персонаж итальянской комедии", image: "/images/IMG_1662.PNG", price: 4500, video: "/videos/piero.mp4" },
+  { id: 5, name: "Эльза", desc: "Снежная королева из Холодного сердца", image: "/images/эльза.PNG", price: 6500, video: "/videos/elsa.mp4" },
+  { id: 6, name: "Пират", desc: "Отважный морской разбойник", image: "/images/пират.PNG", price: 5000, video: "/videos/pirate.mp4" },
+  { id: 7, name: "Гарри Поттер", desc: "Юный волшебник из Хогвартса", image: "/images/гарри поттер.PNG", price: 6000, video: "/videos/harrypotter.mp4" },
+  { id: 8, name: "Черепашки ниндзя", desc: "Четверка героев-мутантов", image: "/images/черепашки ниндзя.PNG", price: 8000, video: "/videos/tmnt.mp4" },
+  { id: 9, name: "Русалочка", desc: "Морская принцесса", image: "/images/русалочка.PNG", price: 5500, video: "/videos/mermaid.mp4" },
+  { id: 10, name: "Лего Ниндзяго", desc: "Ниндзя из мира Леgo", image: "/images/лего ниндзяго.PNG", price: 5500, video: "/videos/ninjago.mp4" },
+  { id: 11, name: "Белоснежка", desc: "Самая добрая принцесса", image: "/images/белоснежка.PNG", price: 5500, video: "/videos/snowwhite.mp4" },
+  { id: 12, name: "Лунтик", desc: "Добрый пришелец с Луны", image: "/images/лунтик.PNG", price: 5000, video: "/videos/luntik.mp4" }
+];
+
+const showsData = [
+  { id: 1, name: "Химическое Шоу", desc: "Удивительные эксперименты с жидким азотом", image: "/images/chemistry.jpeg", price: 10000, video: "/videos/chemistry-show.mp4" },
+  { id: 2, name: "Бумажное Шоу", desc: "Музыка, танцы и море бумаги", image: "/images/paper.jpeg", price: 12000, video: "/videos/paper-show.mp4" },
+  { id: 3, name: "Шоу Пузырей", desc: "Волшебный мир огромных мыльных пузырей", image: "/images/bubble.jpeg", price: 8000, video: "/videos/bubble-show.mp4" },
+  { id: 4, name: "Шоу магии", desc: "Волшебное шоу для детей", image: "/images/majic.jpeg", price: 8000, video: "/videos/magic-show.mp4" }
+];
+
+const masterClassesData = [
+  { id: 1, name: "Создание костюмов", desc: "Научитесь создавать костюмы своими руками", price: 2500, icon: "✂️" },
+  { id: 2, name: "Актерское мастерство", desc: "Основы перевоплощения в персонажей", price: 3000, icon: "🎭" },
+  { id: 3, name: "Грим и макияж", desc: "Профессиональные техники грима", price: 2800, icon: "🎨" }
+];
+
+const additionalServices = [
+  { id: 1, name: "Тортик", price: 3000 },
+  { id: 2, name: "Фотограф", price: 5000 },
+  { id: 3, name: "Пиньята", price: 1500 }
+];
+
+// Обслуживание фронтенда - index.html в корневой папке
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Функция отправки email
 async function sendConfirmationEmail(booking) {
   const mailOptions = {
@@ -470,22 +429,6 @@ async function sendConfirmationEmail(booking) {
 
   await transporter.sendMail(mailOptions);
 }
-
-// Обработка ошибок
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
-  process.exit(1);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  process.exit(1);
-});
-
-// Обслуживание фронтенда
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
 
 // Запуск сервера
 loadData();
