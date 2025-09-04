@@ -57,42 +57,50 @@ const transporter = nodemailer.createTransport(EMAIL_CONFIG);
 
 // Мидлвары
 app.use(helmet({
-  contentSecurityPolicy: false // Отключаем CSP чтобы избежать проблем
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'", // Разрешаем inline скрипты (необходимо для некоторых функций)
+        "https://cdnjs.cloudflare.com"
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'", // Разрешаем inline стили
+        "https://cdnjs.cloudflare.com"
+      ],
+      imgSrc: [
+        "'self'",
+        "data:",
+        "https:",
+        "blob:"
+      ],
+      connectSrc: [
+        "'self'",
+        "https://r-saifullin-8.onrender.com"
+      ],
+      fontSrc: [
+        "'self'",
+        "https://cdnjs.cloudflare.com",
+        "data:"
+      ],
+      mediaSrc: [
+        "'self'",
+        "https:",
+        "blob:"
+      ],
+      objectSrc: ["'none'"],
+      frameSrc: ["'none'"],
+      formAction: ["'self'"]
+    }
+  },
+  crossOriginEmbedderPolicy: false, // Отключаем для корректной работы скриптов
+  crossOriginResourcePolicy: { policy: "cross-origin" } // Разрешаем кросс-доменные ресурсы
 }));
+
 app.use(cors());
 app.use(express.json({ limit: '10kb' }));
-
-// Сначала блокируем доступ к серверным файлам
-app.get([
-  '/app.js',
-  '/server.js', 
-  '/package.json', 
-  '/package-lock.json', 
-  '/node_modules/*',
-  '/.env',
-  '/.git/*',
-  '/data.json',
-  '/.gitignore',
-  '/README.md'
-], (req, res) => {
-  console.log('Blocked access to server file:', req.path);
-  res.status(404).send('Not found');
-});
-
-// Блокировка .js файлов кроме разрешенных папок
-app.get('*.js', (req, res, next) => {
-  // Разрешаем только js файлы в определенных папках
-  if (req.path.startsWith('/js/') || 
-      req.path.startsWith('/scripts/') || 
-      req.path.startsWith('/vendor/') ||
-      req.path.startsWith('/assets/') ||
-      req.path.startsWith('/static/')) {
-    next();
-  } else {
-    console.log('Blocked JS file access:', req.path);
-    res.status(404).send('Not found');
-  }
-});
 
 // Лимитер запросов для API
 const apiLimiter = rateLimit({
@@ -128,7 +136,10 @@ app.use(express.static(__dirname, {
 
     if (mimeTypes[ext]) {
       res.setHeader('Content-Type', mimeTypes[ext]);
-      res.setHeader('X-Content-Type-Options', 'nosniff');
+      // Убираем nosniff для JavaScript чтобы избежать блокировки
+      if (ext !== '.js') {
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+      }
     } else {
       // Для неизвестных расширений блокируем доступ
       res.status(404).end();
@@ -136,6 +147,23 @@ app.use(express.static(__dirname, {
     }
   }
 }));
+
+// Блокировка доступа к серверным файлам
+app.get([
+  '/app.js',
+  '/server.js', 
+  '/package.json', 
+  '/package-lock.json', 
+  '/node_modules/*',
+  '/.env',
+  '/.git/*',
+  '/data.json',
+  '/.gitignore',
+  '/README.md'
+], (req, res) => {
+  console.log('Blocked access to server file:', req.path);
+  res.status(404).send('Not found');
+});
 
 // Функции для работы с ценами
 function createPriceSignature(productId, price, type = 'character') {
@@ -490,7 +518,7 @@ loadData();
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Open in browser: http://localhost:${PORT}`);
-  console.log('Price security enabled with HMAC signatures');
+  console.log('CSP and price security enabled');
 });
 
 // Сохранение данных при завершении
