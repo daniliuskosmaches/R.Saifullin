@@ -1716,22 +1716,22 @@ h2:after {
   .character-card,
   .show-card,
   .master-card {
-    width: 280px;
-    height: 380px;
+    width: 180px;    /* Было 280px */
+    height: 240px;   /* Было 380px */
     margin: 0;
     scroll-snap-align: center;
     flex: 0 0 auto;
     border-radius: 12px;
-    padding: 20px;
+    padding: 12px;   /* Было 20px */
     background: rgba(214, 196, 155, 0.1);
     border: 1px solid var(--accent-color);
   }
 
   .character-card img,
   .show-card img {
-    width: 150px;
-    height: 150px;
-    margin-bottom: 20px;
+    width: 90px;     /* Было 150px */
+    height: 90px;
+    margin-bottom: 12px; /* Было 20px */
   }
 
   .master-card .master-icon {
