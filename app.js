@@ -57,16 +57,7 @@ const transporter = nodemailer.createTransport(EMAIL_CONFIG);
 
 // Мидлвары
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      mediaSrc: ["'self'", "https:"],
-      fontSrc: ["'self'", "https://cdnjs.cloudflare.com"]
-    }
-  }
+  contentSecurityPolicy: false // Отключаем CSP чтобы избежать проблем
 }));
 app.use(cors());
 app.use(express.json({ limit: '10kb' }));
@@ -111,21 +102,16 @@ const apiLimiter = rateLimit({
 });
 app.use('/api/', apiLimiter);
 
-// Только после блокировки серверных файлов - безопасная раздача статических файлов
+// Правильная настройка статических файлов с явным указанием MIME-типов
 app.use(express.static(__dirname, {
   setHeaders: (res, filePath) => {
     const ext = path.extname(filePath).toLowerCase();
-    const allowedExtensions = ['.html', '.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.mp4', '.webm', '.svg', '.woff', '.woff2', '.ttf', '.eot'];
     
-    if (!allowedExtensions.includes(ext)) {
-      res.status(404).end();
-      return;
-    }
-
-    // Устанавливаем правильные Content-Type
+    // Явно устанавливаем правильные MIME-типы
     const mimeTypes = {
-      '.css': 'text/css',
-      '.js': 'application/javascript',
+      '.html': 'text/html; charset=UTF-8',
+      '.css': 'text/css; charset=UTF-8',
+      '.js': 'application/javascript; charset=UTF-8',
       '.png': 'image/png',
       '.jpg': 'image/jpeg',
       '.jpeg': 'image/jpeg',
@@ -142,6 +128,11 @@ app.use(express.static(__dirname, {
 
     if (mimeTypes[ext]) {
       res.setHeader('Content-Type', mimeTypes[ext]);
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+    } else {
+      // Для неизвестных расширений блокируем доступ
+      res.status(404).end();
+      return;
     }
   }
 }));
