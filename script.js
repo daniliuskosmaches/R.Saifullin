@@ -304,7 +304,7 @@ const showsData = [
     "price": "1400 AED",
     "age": "2-7 лет",
     "duration": "30 минут",
-    "video": "videos/Foam.mp4",
+    "video": "https://daniliuskosmaches.github.io/videos/Fom.mp4",
     "image": "images/bubble.jpg"
   },
   {
@@ -313,7 +313,7 @@ const showsData = [
     "price": "1800 AED",
     "age": "5-12 лет",
     "duration": "30 минут",
-    "video": "videos/Bubble.mp4",
+    "video": "https://daniliuskosmaches.github.io/videos/videos/Bubble.mp4",
     "image": "images/bubble.jpg"
   },
   {
@@ -322,7 +322,7 @@ const showsData = [
     "price": "1400 AED",
     "age": "5-15 лет",
     "duration": "30 минут",
-    "video": "videos/Chemical.mp4",
+    "video": "https://daniliuskosmaches.github.io/videos/Chemical.mp4",
     "image": "images/chemical.jpg"
   },
   {
@@ -331,7 +331,7 @@ const showsData = [
     "price": "1400 AED",
     "age": "6-15 лет",
     "duration": "30 минут",
-    "video": "videos/Tesla.mp4",
+    "video": "https://daniliuskosmaches.github.io/videos/videos/Tesla.mp4",
     "image": "images/tesla.jpg"
   },
   {
@@ -340,7 +340,7 @@ const showsData = [
     "price": "2000 AED",
     "age": "5-9 лет",
     "duration": "30 минут",
-    "video": "videos/Paper.mp4",
+    "video": "https://daniliuskosmaches.github.io/videos/Paper.mp4",
     "image": "images/paper.jpg"
   },
   {
@@ -349,7 +349,7 @@ const showsData = [
     "price": "1800 AED",
     "age": "5-15 лет",
     "duration": "45 минут",
-    "video": "videos/Icecream.mp4",
+    "video": "https://daniliuskosmaches.github.io/videos/Icecream.mp4",
     "image": "images/cryo.jpg"
   },
   {
@@ -367,7 +367,7 @@ const showsData = [
     "price": "1200 AED (до 10 детей)",
     "age": "5-10 лет",
     "duration": "30-45 минут",
-    "video": "videos/Notebook.mp4",
+    "video": "https://daniliuskosmaches.github.io/videos/Notebook.mp4",
     "image": "images/notebook.jpg"
   },
   {
@@ -394,7 +394,7 @@ const showsData = [
     "price": "1900 AED",
     "age": "5+",
     "duration": "40 минут",
-    "video": "videos/Crazy.mp4",
+    "video": "https://daniliuskosmaches.github.io/videos/Crazybox.mp4",
     "image": "images/crazybox.jpg"
   },
   {
@@ -403,7 +403,7 @@ const showsData = [
     "price": "700 AED",
     "age": "6+",
     "duration": "60 минут",
-    "video": "videos/Mafia.mp4",
+    "video": "https://daniliuskosmaches.github.io/videos/Mafiakids.mp4",
     "image": "images/mafia.jpg"
   },
   {
@@ -412,7 +412,7 @@ const showsData = [
     "price": "900 AED",
     "age": "16+",
     "duration": "60 минут",
-    "video": "videos/MagicAdults.mp4",
+    "video": "https://daniliuskosmaches.github.io/videos/Mafia.mp4",
     "image": "images/mafia.jpg"
   },
   {
