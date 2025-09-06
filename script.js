@@ -443,6 +443,23 @@ let maxShows = 0;
 let maxMasterClasses = 0;
 let basePrice = 0;
 
+// Кастомные цены для кастомного пакета
+const CUSTOM_PRICES = {
+  character: 5000,
+  show: 8000,
+  master: 5000,
+  products: {
+    photo: 3000,
+    decor: 2000, // Мини подарки
+    pinata: 3500
+  },
+  additional: {
+    cake: 0, // если не нужен, можно убрать или оставить 0
+    photographer: 3000,
+    pinata: 3500
+  }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
   initSliders();
   initPackageSelection();
@@ -488,16 +505,21 @@ function initSliders() {
     const card = document.createElement('div');
     card.className = `character-card ${isSelected ? 'selected' : ''}`;
     card.dataset.name = character.name;
-    
+
+    // Цена только для кастомного пакета
+    let priceHtml = '';
+    if (currentPackage === 'custom') {
+      priceHtml = `<p class="price-tag">${CUSTOM_PRICES.character}₽</p>`;
+    }
+
     card.innerHTML = `
       <img src="${character.image}" alt="${character.name}">
       <div class="character-info">
         <h4>${character.name}</h4>
         <p>${character.desc}</p>
-        ${currentPackage === 'custom' ? `<p class="price-tag">${character.price}₽</p>` : ''}
+        ${priceHtml}
       </div>
     `;
-    
     charactersSlider.appendChild(card);
   });
 
@@ -509,17 +531,29 @@ function initSliders() {
     const card = document.createElement('div');
     card.className = `show-card ${isSelected ? 'selected' : ''}`;
     card.dataset.name = show.name;
-    
+
+    // Цена только для кастомного пакета
+    let priceHtml = '';
+    if (currentPackage === 'custom') {
+      priceHtml = `<p class="price-tag">${CUSTOM_PRICES.show}₽</p>`;
+    }
+
+    // Заменить AED на ₽ для отображения
+    let showDesc = show.desc;
+    let showPrice = show.price;
+    if (typeof showPrice === 'string') {
+      showPrice = showPrice.replace(/AED/g, '₽');
+    }
+
     card.innerHTML = `
       <img src="${show.image}" alt="${show.name}">
       <div class="show-info">
         <h4>${show.name}</h4>
-        <p>${show.desc}</p>
-        ${currentPackage === 'custom' ? `<p class="price-tag">${show.price}</p>` : ''}
+        <p>${showDesc}</p>
+        ${priceHtml}
         <button class="view-btn" data-video="${show.video}" data-name="${show.name}">Посмотреть</button>
       </div>
     `;
-    
     showsSlider.appendChild(card);
   });
 
@@ -531,14 +565,19 @@ function initSliders() {
     const card = document.createElement('div');
     card.className = `master-card ${isSelected ? 'selected' : ''}`;
     card.dataset.name = master.name;
-    
+
+    // Цена только для кастомного пакета
+    let priceHtml = '';
+    if (currentPackage === 'custom') {
+      priceHtml = `<p class="price-tag">${CUSTOM_PRICES.master}₽</p>`;
+    }
+
     card.innerHTML = `
       <div class="master-icon">${master.icon}</div>
       <h4>${master.name}</h4>
       <p>${master.desc}</p>
-      ${currentPackage === 'custom' ? `<p class="price-tag">${master.price}₽</p>` : ''}
+      ${priceHtml}
     `;
-    
     masterSlider.appendChild(card);
   });
 
@@ -843,8 +882,14 @@ function initProductButtons() {
       e.stopPropagation();
       const card = this.closest('.product-card');
       const name = card.dataset.name;
-      const price = parseInt(card.dataset.price, 10);
+      let price = parseInt(card.dataset.price, 10);
       const id = card.dataset.product;
+      // Кастомная цена только для кастомного пакета
+      if (currentPackage === 'custom') {
+        if (id === 'photo') price = CUSTOM_PRICES.products.photo;
+        else if (id === 'decor') price = CUSTOM_PRICES.products.decor;
+        else if (id === 'pinata') price = CUSTOM_PRICES.products.pinata;
+      }
       if (!selectedProducts.some(p => p.id === id)) {
         selectedProducts.push({ id, name, price });
         showNotification(`Товар "${name}" добавлен`, 'success');
@@ -858,8 +903,14 @@ function initAdditionalServiceCheckboxes() {
   document.querySelectorAll('.additional-service').forEach(chk => {
     chk.addEventListener('change', function() {
       const name = this.dataset.name;
-      const price = parseInt(this.dataset.price, 10);
+      let price = parseInt(this.dataset.price, 10);
       const id = this.dataset.type;
+      // Кастомная цена только для кастомного пакета
+      if (currentPackage === 'custom') {
+        if (id === 'photographer') price = CUSTOM_PRICES.products.photo;
+        else if (id === 'pinata') price = CUSTOM_PRICES.products.pinata;
+        else if (id === 'cake') price = 0;
+      }
       if (this.checked) {
         if (!selectedAdditionalServices.some(s => s.id === id)) {
           selectedAdditionalServices.push({ id, name, price });
@@ -878,27 +929,255 @@ function updateFormSelectedServices() {
   html += `<div class="selected-item">Пакет: ${getPackageName(currentPackage)} <span>${document.getElementById('total-price').textContent}₽</span></div>`;
   if (selectedCharacters.length > 0) {
     selectedCharacters.forEach(char => {
-      html += `<div class="selected-item">${char.name} <span>${char.price}₽</span></div>`;
+      if (currentPackage === 'custom') {
+        html += `<div class="selected-item">${char.name} <span>${CUSTOM_PRICES.character}₽</span></div>`;
+      } else {
+        html += `<div class="selected-item">${char.name}</div>`;
+      }
     });
   }
   if (selectedShows.length > 0) {
     selectedShows.forEach(show => {
-      html += `<div class="selected-item">${show.name} <span>${show.price}₽</span></div>`;
+      if (currentPackage === 'custom') {
+        html += `<div class="selected-item">${show.name} <span>${CUSTOM_PRICES.show}₽</span></div>`;
+      } else {
+        html += `<div class="selected-item">${show.name}</div>`;
+      }
     });
   }
   if (selectedMasterClasses.length > 0) {
     selectedMasterClasses.forEach(master => {
-      html += `<div class="selected-item">${master.name} <span>${master.price}₽</span></div>`;
+      if (currentPackage === 'custom') {
+        html += `<div class="selected-item">${master.name} <span>${CUSTOM_PRICES.master}₽</span></div>`;
+      } else {
+        html += `<div class="selected-item">${master.name}</div>`;
+      }
     });
   }
   if (selectedProducts.length > 0) {
     selectedProducts.forEach(prod => {
-      html += `<div class="selected-item">${prod.name} <span>${prod.price}₽</span></div>`;
+      let price = prod.price;
+      if (currentPackage === 'custom') {
+        if (prod.id === 'photo') price = CUSTOM_PRICES.products.photo;
+        else if (prod.id === 'decor') price = CUSTOM_PRICES.products.decor;
+        else if (prod.id === 'pinata') price = CUSTOM_PRICES.products.pinata;
+        html += `<div class="selected-item">${prod.name} <span>${price}₽</span></div>`;
+      } else {
+        html += `<div class="selected-item">${prod.name}</div>`;
+      }
     });
   }
   if (selectedAdditionalServices.length > 0) {
     selectedAdditionalServices.forEach(serv => {
-      html += `<div class="selected-item">${serv.name} <span>${serv.price}₽</span></div>`;
+      let price = serv.price;
+      if (currentPackage === 'custom') {
+        if (serv.id === 'photographer') price = CUSTOM_PRICES.products.photo;
+        else if (serv.id === 'pinata') price = CUSTOM_PRICES.products.pinata;
+        else if (serv.id === 'cake') price = 0;
+        html += `<div class="selected-item">${serv.name} <span>${price}₽</span></div>`;
+      } else {
+        html += `<div class="selected-item">${serv.name}</div>`;
+      }
+    });
+  }
+  html += '</div>';
+  formServices.innerHTML = html;
+}
+
+function resetSelection() {
+  currentPackage = null;
+  selectedCharacters = [];
+  selectedShows = [];
+  selectedMasterClasses = [];
+  selectedProducts = [];
+  selectedAdditionalServices = [];
+  document.getElementById('package-selection').classList.remove('active');
+  document.getElementById('form-selected-services').innerHTML = '';
+  document.querySelectorAll('.character-card, .show-card, .master-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+  updateSelection();
+}
+
+function initPhoneMask() {
+  const phoneInput = document.getElementById('phone');
+  
+  phoneInput.addEventListener('input', function(e) {
+    let value = this.value.replace(/\D/g, '');
+    
+    if (value.length > 0) {
+      value = '+7 (' + value.substring(1, 4) + ') ' + value.substring(4, 7) + '-' + value.substring(7, 9) + '-' + value.substring(9, 11);
+    }
+    
+    this.value = value.substring(0, 18);
+  });
+}
+
+function initModalClose() {
+  document.querySelectorAll('.close-modal').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.classList.remove('active');
+      });
+    });
+  });
+  
+  document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.remove('active');
+      }
+    });
+  });
+}
+
+function showNotification(message, type) {
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.classList.add('show');
+  }, 10);
+  
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 300);
+  }, 3000);
+}
+
+function updateSelection() {
+  document.getElementById('characters-count').textContent = selectedCharacters.length;
+  document.getElementById('shows-count').textContent = selectedShows.length;
+  document.getElementById('master-count').textContent = selectedMasterClasses.length;
+  updateSelectedServicesPreview();
+  updateTotalPrice();
+}
+
+function scrollCarousel(id, amount) {
+  const carousel = document.getElementById(id);
+  carousel.scrollBy({ left: amount, behavior: 'smooth' });
+}
+
+function showVideoModal(videoUrl, title) {
+  const modal = document.getElementById('video-modal');
+  const video = document.getElementById('modal-video');
+  const videoTitle = document.getElementById('video-modal-title');
+  
+  video.src = videoUrl;
+  videoTitle.textContent = title;
+  modal.classList.add('active');
+  
+  document.querySelector('#video-modal .close-modal').addEventListener('click', function() {
+    video.pause();
+  });
+}
+
+function initProductButtons() {
+  document.querySelectorAll('.product-card .add-product-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const card = this.closest('.product-card');
+      const name = card.dataset.name;
+      let price = parseInt(card.dataset.price, 10);
+      const id = card.dataset.product;
+      // Кастомная цена только для кастомного пакета
+      if (currentPackage === 'custom') {
+        if (id === 'photo') price = CUSTOM_PRICES.products.photo;
+        else if (id === 'decor') price = CUSTOM_PRICES.products.decor;
+        else if (id === 'pinata') price = CUSTOM_PRICES.products.pinata;
+      }
+      if (!selectedProducts.some(p => p.id === id)) {
+        selectedProducts.push({ id, name, price });
+        showNotification(`Товар "${name}" добавлен`, 'success');
+        updateSelection();
+      }
+    });
+  });
+}
+
+function initAdditionalServiceCheckboxes() {
+  document.querySelectorAll('.additional-service').forEach(chk => {
+    chk.addEventListener('change', function() {
+      const name = this.dataset.name;
+      let price = parseInt(this.dataset.price, 10);
+      const id = this.dataset.type;
+      // Кастомная цена только для кастомного пакета
+      if (currentPackage === 'custom') {
+        if (id === 'photographer') price = CUSTOM_PRICES.products.photo;
+        else if (id === 'pinata') price = CUSTOM_PRICES.products.pinata;
+        else if (id === 'cake') price = 0;
+      }
+      if (this.checked) {
+        if (!selectedAdditionalServices.some(s => s.id === id)) {
+          selectedAdditionalServices.push({ id, name, price });
+        }
+      } else {
+        selectedAdditionalServices = selectedAdditionalServices.filter(s => s.id !== id);
+      }
+      updateSelection();
+    });
+  });
+}
+
+function updateFormSelectedServices() {
+  const formServices = document.getElementById('form-selected-services');
+  let html = '<h4>Выбранные услуги:</h4><div class="selected-items">';
+  html += `<div class="selected-item">Пакет: ${getPackageName(currentPackage)} <span>${document.getElementById('total-price').textContent}₽</span></div>`;
+  if (selectedCharacters.length > 0) {
+    selectedCharacters.forEach(char => {
+      if (currentPackage === 'custom') {
+        html += `<div class="selected-item">${char.name} <span>${CUSTOM_PRICES.character}₽</span></div>`;
+      } else {
+        html += `<div class="selected-item">${char.name}</div>`;
+      }
+    });
+  }
+  if (selectedShows.length > 0) {
+    selectedShows.forEach(show => {
+      if (currentPackage === 'custom') {
+        html += `<div class="selected-item">${show.name} <span>${CUSTOM_PRICES.show}₽</span></div>`;
+      } else {
+        html += `<div class="selected-item">${show.name}</div>`;
+      }
+    });
+  }
+  if (selectedMasterClasses.length > 0) {
+    selectedMasterClasses.forEach(master => {
+      if (currentPackage === 'custom') {
+        html += `<div class="selected-item">${master.name} <span>${CUSTOM_PRICES.master}₽</span></div>`;
+      } else {
+        html += `<div class="selected-item">${master.name}</div>`;
+      }
+    });
+  }
+  if (selectedProducts.length > 0) {
+    selectedProducts.forEach(prod => {
+      let price = prod.price;
+      if (currentPackage === 'custom') {
+        if (prod.id === 'photo') price = CUSTOM_PRICES.products.photo;
+        else if (prod.id === 'decor') price = CUSTOM_PRICES.products.decor;
+        else if (prod.id === 'pinata') price = CUSTOM_PRICES.products.pinata;
+        html += `<div class="selected-item">${prod.name} <span>${price}₽</span></div>`;
+      } else {
+        html += `<div class="selected-item">${prod.name}</div>`;
+      }
+    });
+  }
+  if (selectedAdditionalServices.length > 0) {
+    selectedAdditionalServices.forEach(serv => {
+      let price = serv.price;
+      if (currentPackage === 'custom') {
+        if (serv.id === 'photographer') price = CUSTOM_PRICES.products.photo;
+        else if (serv.id === 'pinata') price = CUSTOM_PRICES.products.pinata;
+        else if (serv.id === 'cake') price = 0;
+        html += `<div class="selected-item">${serv.name} <span>${price}₽</span></div>`;
+      } else {
+        html += `<div class="selected-item">${serv.name}</div>`;
+      }
     });
   }
   html += '</div>';
@@ -922,6 +1201,7 @@ function updateSelectedServicesPreview() {
     html += `<div class="selected-item-card">
       <img src="${character.image}" alt="${char.name}" class="selected-item-img">
       <div class="selected-item-name">${char.name}</div>
+      ${currentPackage === 'custom' ? `<div class="price-tag">${CUSTOM_PRICES.character}₽</div>` : ''}
       <div class="remove-item-btn" onclick="removeSelectedItem('character', '${char.name}')">×</div>
     </div>`;
   });
@@ -931,6 +1211,7 @@ function updateSelectedServicesPreview() {
     html += `<div class="selected-item-card">
       <img src="${showData.image}" alt="${show.name}" class="selected-item-img">
       <div class="selected-item-name">${show.name}</div>
+      ${currentPackage === 'custom' ? `<div class="price-tag">${CUSTOM_PRICES.show}₽</div>` : ''}
       <div class="remove-item-btn" onclick="removeSelectedItem('show', '${show.name}')">×</div>
     </div>`;
   });
@@ -942,33 +1223,48 @@ function updateSelectedServicesPreview() {
         ${masterData.icon}
       </div>
       <div class="selected-item-name">${master.name}</div>
+      ${currentPackage === 'custom' ? `<div class="price-tag">${CUSTOM_PRICES.master}₽</div>` : ''}
       <div class="remove-item-btn" onclick="removeSelectedItem('master', '${master.name}')">×</div>
     </div>`;
   });
   
   selectedProducts.forEach(prod => {
+    let price = prod.price;
+    if (currentPackage === 'custom') {
+      if (prod.id === 'photo') price = CUSTOM_PRICES.products.photo;
+      else if (prod.id === 'decor') price = CUSTOM_PRICES.products.decor;
+      else if (prod.id === 'pinata') price = CUSTOM_PRICES.products.pinata;
+    }
     html += `<div class="selected-item-card">
       <div class="selected-item-img" style="background: rgba(214, 196, 155, 0.2); display: flex; align-items: center; justify-content: center;">
         <span style="font-size: 2rem;">🎁</span>
       </div>
       <div class="selected-item-name">${prod.name}</div>
+      ${currentPackage === 'custom' ? `<div class="price-tag">${price}₽</div>` : ''}
       <div class="remove-item-btn" onclick="removeSelectedItem('product', '${prod.id}')">×</div>
     </div>`;
   });
   
   selectedAdditionalServices.forEach(serv => {
+    let price = serv.price;
+    if (currentPackage === 'custom') {
+      if (serv.id === 'photographer') price = CUSTOM_PRICES.products.photo;
+      else if (serv.id === 'pinata') price = CUSTOM_PRICES.products.pinata;
+      else if (serv.id === 'cake') price = 0;
+    }
     html += `<div class="selected-item-card">
       <div class="selected-item-img" style="background: rgba(214, 196, 155, 0.2); display: flex; align-items: center; justify-content: center;">
         <span style="font-size: 2rem;">🍰</span>
       </div>
       <div class="selected-item-name">${serv.name}</div>
+      ${currentPackage === 'custom' ? `<div class="price-tag">${price}₽</div>` : ''}
       <div class="remove-item-btn" onclick="removeSelectedItem('additional', '${serv.id}')">×</div>
     </div>`;
   });
   
   html += '</div>';
   preview.innerHTML = html;
-  
+
   window.removePackage = function() {
     currentPackage = null;
     selectedCharacters = [];
@@ -980,7 +1276,7 @@ function updateSelectedServicesPreview() {
     document.querySelectorAll('.additional-service').forEach(chk => chk.checked = false);
     updateSelection();
   };
-  
+
   window.removeSelectedItem = function(type, name) {
     if (type === 'character') {
       const index = selectedCharacters.findIndex(c => c.name === name);
@@ -1005,14 +1301,24 @@ function updateTotalPrice() {
   const totalPriceElement = document.getElementById('total-price');
   let total = 0;
   if (currentPackage === 'custom') {
-    selectedCharacters.forEach(c => total += c.price);
-    selectedShows.forEach(s => total += s.price);
-    selectedMasterClasses.forEach(m => total += m.price);
+    total += selectedCharacters.length * CUSTOM_PRICES.character;
+    total += selectedShows.length * CUSTOM_PRICES.show;
+    total += selectedMasterClasses.length * CUSTOM_PRICES.master;
+    selectedProducts.forEach(prod => {
+      if (prod.id === 'photo') total += CUSTOM_PRICES.products.photo;
+      else if (prod.id === 'decor') total += CUSTOM_PRICES.products.decor;
+      else if (prod.id === 'pinata') total += CUSTOM_PRICES.products.pinata;
+    });
+    selectedAdditionalServices.forEach(serv => {
+      if (serv.id === 'photographer') total += CUSTOM_PRICES.products.photo;
+      else if (serv.id === 'pinata') total += CUSTOM_PRICES.products.pinata;
+      else if (serv.id === 'cake') total += 0;
+    });
   } else {
     total = basePrice;
+    selectedProducts.forEach(p => total += p.price);
+    selectedAdditionalServices.forEach(s => total += s.price);
   }
-  selectedProducts.forEach(p => total += p.price);
-  selectedAdditionalServices.forEach(s => total += s.price);
   totalPriceElement.textContent = total.toLocaleString('ru-RU');
 }
 
