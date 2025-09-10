@@ -460,6 +460,15 @@ const CUSTOM_PRICES = {
   }
 };
 
+// Автоматически генерируем 23 фото-отзыва
+const orbitItems = Array.from({ length: 23 }, (_, i) => ({
+  photo: `images/${i + 1}.jpg`,
+  author: `Гость №${i + 1}`,
+  title: `Праздник №${i + 1}`,
+  text: `Спасибо за праздник! Всё было очень круто!`,
+  date: `2023`
+}));
+
 document.addEventListener('DOMContentLoaded', function() {
   initSliders();
   initPackageSelection();
@@ -472,6 +481,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initIntersectionObserver();
   initProductButtons();
   initAdditionalServiceCheckboxes();
+  initOrbitGallery();
 });
 
 function initIntersectionObserver() {
@@ -1184,6 +1194,206 @@ function updateFormSelectedServices() {
   formServices.innerHTML = html;
 }
 
+function resetSelection() {
+  currentPackage = null;
+  selectedCharacters = [];
+  selectedShows = [];
+  selectedMasterClasses = [];
+  selectedProducts = [];
+  selectedAdditionalServices = [];
+  document.getElementById('package-selection').classList.remove('active');
+  document.getElementById('form-selected-services').innerHTML = '';
+  document.querySelectorAll('.character-card, .show-card, .master-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+  updateSelection();
+}
+
+function initPhoneMask() {
+  const phoneInput = document.getElementById('phone');
+  
+  phoneInput.addEventListener('input', function(e) {
+    let value = this.value.replace(/\D/g, '');
+    
+    if (value.length > 0) {
+      value = '+7 (' + value.substring(1, 4) + ') ' + value.substring(4, 7) + '-' + value.substring(7, 9) + '-' + value.substring(9, 11);
+    }
+    
+    this.value = value.substring(0, 18);
+  });
+}
+
+function initModalClose() {
+  document.querySelectorAll('.close-modal').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.classList.remove('active');
+      });
+    });
+  });
+  
+  document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.remove('active');
+      }
+    });
+  });
+}
+
+function showNotification(message, type) {
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.classList.add('show');
+  }, 10);
+  
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 300);
+  }, 3000);
+}
+
+function updateSelection() {
+  document.getElementById('characters-count').textContent = selectedCharacters.length;
+  document.getElementById('shows-count').textContent = selectedShows.length;
+  document.getElementById('master-count').textContent = selectedMasterClasses.length;
+  updateSelectedServicesPreview();
+  updateTotalPrice();
+}
+
+function scrollCarousel(id, amount) {
+  const carousel = document.getElementById(id);
+  carousel.scrollBy({ left: amount, behavior: 'smooth' });
+}
+
+function showVideoModal(videoUrl, title) {
+  const modal = document.getElementById('video-modal');
+  const video = document.getElementById('modal-video');
+  const videoTitle = document.getElementById('video-modal-title');
+  
+  video.src = videoUrl;
+  videoTitle.textContent = title;
+  modal.classList.add('active');
+  
+  document.querySelector('#video-modal .close-modal').addEventListener('click', function() {
+    video.pause();
+  });
+}
+
+function initProductButtons() {
+  document.querySelectorAll('.product-card .add-product-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const card = this.closest('.product-card');
+      const name = card.dataset.name;
+      let price = parseInt(card.dataset.price, 10);
+      const id = card.dataset.product;
+      // Кастомная цена только для кастомного пакета
+      if (currentPackage === 'custom') {
+        if (id === 'photo') price = CUSTOM_PRICES.products.photo;
+        else if (id === 'decor') price = CUSTOM_PRICES.products.decor;
+        else if (id === 'pinata') price = CUSTOM_PRICES.products.pinata;
+      }
+      if (!selectedProducts.some(p => p.id === id)) {
+        selectedProducts.push({ id, name, price });
+        showNotification(`Товар "${name}" добавлен`, 'success');
+        updateSelection();
+      }
+    });
+  });
+}
+
+function initAdditionalServiceCheckboxes() {
+  document.querySelectorAll('.additional-service').forEach(chk => {
+    chk.addEventListener('change', function() {
+      const name = this.dataset.name;
+      let price = parseInt(this.dataset.price, 10);
+      const id = this.dataset.type;
+      // Кастомная цена только для кастомного пакета
+      if (currentPackage === 'custom') {
+        if (id === 'photographer') price = CUSTOM_PRICES.products.photo;
+        else if (id === 'pinata') price = CUSTOM_PRICES.products.pinata;
+        else if (id === 'cake') price = 0;
+      }
+      if (this.checked) {
+        if (!selectedAdditionalServices.some(s => s.id === id)) {
+          selectedAdditionalServices.push({ id, name, price });
+        }
+      } else {
+        selectedAdditionalServices = selectedAdditionalServices.filter(s => s.id !== id);
+      }
+      updateSelection();
+    });
+  });
+}
+
+function updateFormSelectedServices() {
+  const formServices = document.getElementById('form-selected-services');
+  let html = '<h4>Выбранные услуги:</h4><div class="selected-items">';
+  html += `<div class="selected-item">Пакет: ${getPackageName(currentPackage)} <span>${document.getElementById('total-price').textContent}₽</span></div>`;
+  if (selectedCharacters.length > 0) {
+    selectedCharacters.forEach(char => {
+      if (currentPackage === 'custom') {
+        html += `<div class="selected-item">${char.name} <span>${CUSTOM_PRICES.character}₽</span></div>`;
+      } else {
+        html += `<div class="selected-item">${char.name}</div>`;
+      }
+    });
+  }
+  if (selectedShows.length > 0) {
+    selectedShows.forEach(show => {
+      if (currentPackage === 'custom') {
+        html += `<div class="selected-item">${show.name} <span>${CUSTOM_PRICES.show}₽</span></div>`;
+      } else {
+        html += `<div class="selected-item">${show.name}</div>`;
+      }
+    });
+  }
+  if (selectedMasterClasses.length > 0) {
+    selectedMasterClasses.forEach(master => {
+      if (currentPackage === 'custom') {
+        html += `<div class="selected-item">${master.name} <span>${CUSTOM_PRICES.master}₽</span></div>`;
+      } else {
+        html += `<div class="selected-item">${master.name}</div>`;
+      }
+    });
+  }
+  if (selectedProducts.length > 0) {
+    selectedProducts.forEach(prod => {
+      let price = prod.price;
+      if (currentPackage === 'custom') {
+        if (prod.id === 'photo') price = CUSTOM_PRICES.products.photo;
+        else if (prod.id === 'decor') price = CUSTOM_PRICES.products.decor;
+        else if (prod.id === 'pinata') price = CUSTOM_PRICES.products.pinata;
+        html += `<div class="selected-item">${prod.name} <span>${price}₽</span></div>`;
+      } else {
+        html += `<div class="selected-item">${prod.name}</div>`;
+      }
+    });
+  }
+  if (selectedAdditionalServices.length > 0) {
+    selectedAdditionalServices.forEach(serv => {
+      let price = serv.price;
+      if (currentPackage === 'custom') {
+        if (serv.id === 'photographer') price = CUSTOM_PRICES.products.photo;
+        else if (serv.id === 'pinata') price = CUSTOM_PRICES.products.pinata;
+        else if (serv.id === 'cake') price = 0;
+        html += `<div class="selected-item">${serv.name} <span>${price}₽</span></div>`;
+      } else {
+        html += `<div class="selected-item">${serv.name}</div>`;
+      }
+    });
+  }
+  html += '</div>';
+  formServices.innerHTML = html;
+}
+
 function updateSelectedServicesPreview() {
   const preview = document.getElementById('selected-services');
   let html = '<h4>Выбранные услуги:</h4><div class="selected-items-preview">';
@@ -1413,4 +1623,182 @@ function showProductModal(index) {
   console.log('Показать продукт', index);
 }
 
-// Чекбоксы "Тортик", "Пиньята", "Фотограф" уже добавляются в пакет услуг через selectedAdditionalServices
+function initOrbitGallery() {
+  const orbitGallery = document.getElementById('orbit-gallery');
+  const orbitCenter = document.getElementById('orbit-center');
+  if (!orbitGallery || !orbitCenter) return;
+
+  const count = orbitItems.length;
+  let selectedIndex = 0;
+  let autoTimer = null;
+  let rotation = 0;
+
+  // Расположение по спирали
+  function renderOrbit(selectedIdx) {
+    orbitGallery.innerHTML = '';
+    const spiralTurns = 1.5; // сколько оборотов спирали
+    const minR = 120, maxR = 220;
+    for (let i = 0; i < count; i++) {
+      // Спираль: угол и радиус
+      const t = i / count;
+      const angle = 2 * Math.PI * spiralTurns * t + rotation;
+      const radius = minR + (maxR - minR) * t;
+      const x = 250 + radius * Math.cos(angle) - 45;
+      const y = 250 + radius * Math.sin(angle) - 45;
+      const photoDiv = document.createElement('div');
+      photoDiv.className = 'orbit-photo';
+      if (i === selectedIdx) photoDiv.classList.add('selected');
+      photoDiv.style.left = `${x}px`;
+      photoDiv.style.top = `${y}px`;
+      photoDiv.style.zIndex = i === selectedIdx ? 2 : 1;
+      photoDiv.style.boxShadow = i === selectedIdx
+        ? '0 0 0 8px var(--highlight), 0 8px 32px rgba(0,0,0,0.22)'
+        : '0 4px 16px rgba(0,0,0,0.18)';
+      photoDiv.style.filter = i === selectedIdx ? 'brightness(1.1) saturate(1.2)' : 'brightness(0.85)';
+      photoDiv.innerHTML = `<img src="${orbitItems[i].photo}" alt="${orbitItems[i].author}">`;
+      photoDiv.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showOrbitCenter(i, true);
+      });
+      orbitGallery.appendChild(photoDiv);
+    }
+  }
+
+  function showOrbitCenter(idx, userClick = false) {
+    selectedIndex = idx;
+    renderOrbit(selectedIndex);
+    const item = orbitItems[idx];
+    orbitCenter.innerHTML = `
+      <div class="orbit-center-card">
+        <img class="center-photo" src="${item.photo}" alt="${item.author}">
+        <div class="center-author">${item.author}</div>
+        <div class="center-title">${item.title}</div>
+        <div class="center-text">"${item.text}"</div>
+        <div class="center-date">${item.date}</div>
+      </div>
+    `;
+    if (userClick) {
+      // При клике — сбросить авто-таймер, потом снова запустить
+      if (autoTimer) clearInterval(autoTimer);
+      autoTimer = setInterval(nextOrbit, 6000);
+    }
+  }
+
+  function nextOrbit() {
+    selectedIndex = (selectedIndex + 1) % orbitItems.length;
+    rotation += Math.PI * 2 / orbitItems.length; // плавный поворот
+    showOrbitCenter(selectedIndex);
+  }
+
+  // Начальная отрисовка
+  showOrbitCenter(0);
+
+  // Автоматическое переключение
+  autoTimer = setInterval(nextOrbit, 6000);
+}
+// script.js - ТОЛЬКО добавлены функции для reviews
+// ... весь предыдущий код остается без изменений ...
+
+// ДАННЫЕ ФОТОГРАФИЙ ОТЗЫВОВ (замените на ваши реальные фото)
+const reviewPhotosData = [
+  { id: 1, image: "images/1.jpg", title: "День рождения", date: "15.12.2023" },
+  { id: 2, image: "images/2.jpg", title: "Выпускной", date: "20.12.2023" },
+  { id: 3, image: "images/3.jpg", title: "Новый год", date: "25.12.2023" },
+  { id: 4, image: "images/4.jpg", title: "Детский праздник", date: "30.12.2023" },
+  { id: 5, image: "images/5.jpg", title: "Анимация", date: "05.01.2024" },
+  { id: 6, image: "images/6.jpg", title: "Мастер-класс", date: "10.01.2024" },
+  { id: 7, image: "images/7.jpg", title: "Шоу программа", date: "15.01.2024" },
+  { id: 8, image: "images/8.jpg", title: "Корпоратив", date: "20.01.2024" },
+  { id: 9, image: "images/9.jpg", title: "Свадьба", date: "25.01.2024" },
+  { id: 10, image: "images/10.jpg", title: "Тематическая вечеринка", date: "30.01.2024" },
+  
+   {id: 12, image: "images/12.jpg", title: "", date: "10.02.2024"},
+   { id: 13, image: "images/13.jpg", title: "", date: "15.02.2024" },
+  { id: 14, image: "images/14.jpg", title: "", date: "20.02.2024" },
+  { id: 15, image: "images/15.jpg", title: "Праздник на природе", date: "25.02.2024"
+  },  { id: 16, image: "images/16.jpg", title: "Праздник дома", date: "28.02.2024"
+
+  },{ id: 17, image: "images/17.jpg", title: "Праздник в кафе", date: "05.03.2024" },
+  { id: 18, image: "images/18.jpg", title: "Праздник в парке", date: "10.03.2024" }
+  ,{ id: 19, image: "images/19.jpg", title: "Праздник в музее", date: "15.03.2024" },
+  { id: 20, image: "images/20.jpg", title: "Праздник в театре", date: "20.03.2024" },
+  { id: 21, image: "images/21.jpg", title: "Праздник в зоопарке", date: "25.03.2024" },
+  { id: 22, image: "images/22.jpg", title: "Праздник в аквапарке", date: "30.03.2024" },
+  { id: 23, image: "images/23.jpg", title: "Праздник в цирке", date: "05.04.2024" },
+  
+
+];
+
+let visiblePhotosCount = 4; // Показываем сначала 4 фото
+
+// ФУНКЦИИ ДЛЯ СЕКЦИИ ОТЗЫВОВ
+function renderReviewPhotos() {
+  const reviewsGrid = document.getElementById('reviews-grid');
+  if (!reviewsGrid) return;
+
+  reviewsGrid.innerHTML = '';
+  
+  const photosToShow = reviewPhotosData.slice(0, visiblePhotosCount);
+  
+  photosToShow.forEach((photo, index) => {
+    const photoCard = document.createElement('div');
+    photoCard.className = 'review-photo-card';
+    if (index >= visiblePhotosCount - 4) {
+      photoCard.classList.add('new');
+    }
+    photoCard.innerHTML = `
+      <img src="${photo.image}" alt="${photo.title}" class="review-photo" loading="lazy">
+      <div class="photo-overlay">
+        <div class="photo-info">
+          <div class="photo-title">${photo.title}</div>
+          <div class="photo-date">${photo.date}</div>
+        </div>
+      </div>
+    `;
+    reviewsGrid.appendChild(photoCard);
+  });
+
+  // Показывать/скрывать кнопку "Показать еще"
+  const loadMoreBtn = document.getElementById('load-more-reviews');
+  if (loadMoreBtn) {
+    if (visiblePhotosCount >= reviewPhotosData.length) {
+      loadMoreBtn.style.display = 'none';
+    } else {
+      loadMoreBtn.style.display = 'inline-flex';
+    }
+  }
+}
+
+function loadMorePhotos() {
+  visiblePhotosCount += 4; // Добавляем по 4 фото при каждом клике
+  renderReviewPhotos();
+  
+  // Плавная прокрутка к новым фото
+  setTimeout(() => {
+    const newPhotos = document.querySelectorAll('.review-photo-card.new');
+    if (newPhotos.length > 0) {
+      newPhotos[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, 100);
+}
+
+function initReviewPhotos() {
+  renderReviewPhotos();
+  
+  const loadMoreBtn = document.getElementById('load-more-reviews');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', loadMorePhotos);
+  }
+}
+
+// ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+document.addEventListener('DOMContentLoaded', function() {
+  // ... весь предыдущий код инициализации ...
+  
+  // Добавляем инициализацию фотографий отзывов
+  initReviewPhotos();
+  
+  // ... остальной код инициализации ...
+});
+
+// ... остальной код остается без изменений ...

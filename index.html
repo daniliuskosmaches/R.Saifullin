@@ -14,8 +14,7 @@
       <div class="nav-center">
         <a href="#about" class="nav-button">О нас</a>
         <a href="#packages" class="nav-button">Пакеты</a>
-        <a href="#cases" class="nav-button">Кейсы</a>
-        <a href="#reviews" class="nav-button">Отзывы</a>
+        <a href="#cases-reviews" class="nav-button">Кейсы и отзывы</a>
         <a href="#products" class="nav-button">Доп. товары</a>
         <a href="#contact" class="nav-button">Контакты</a>
       </div>
@@ -27,8 +26,7 @@
     <div class="mobile-menu" id="mobileMenu">
       <a href="#about" class="nav-button">О нас</a>
       <a href="#packages" class="nav-button">Пакеты</a>
-      <a href="#cases" class="nav-button">Кейсы</a>
-      <a href="#reviews" class="nav-button">Отзывы</a>
+      <a href="#cases-reviews" class="nav-button">Кейсы и отзывы</a>
       <a href="#products" class="nav-button">Доп. товары</a>
       <a href="#contact" class="nav-button">Контакты</a>
       <a href="#consultForm" class="nav-button cta">Заказать</a>
@@ -177,76 +175,21 @@
     </div>
   </section>
 
-  <section id="cases">
+ <section id="cases-reviews">
     <div class="section-inner">
-      <h2>Наши кейсы</h2>
-      <p class="subtitle">Реализованные мероприятия и праздники</p>
-      <div class="cases-grid">
-        <div class="case-card">
-          <div class="case-image-container">
-            <img src="case1.jpg" alt="Детский день рождения" loading="lazy">
-          </div>
-          <div class="case-info">
-            <h3>День рождения Алисы</h3>
-            <p>Тематическая вечеринка с Эльзой и шоу мыльных пузырей</p>
-          </div>
+      <h2>Наши работы</h2>
+      <p class="subtitle">Реальные фото с мероприятий</p>
+      
+      <div class="reviews-container">
+        <div class="reviews-grid" id="reviews-grid">
+          <!-- Фотографии будут загружены через JavaScript -->
         </div>
-        <div class="case-card">
-          <div class="case-image-container">
-            <img src="case2.jpg" alt="Выпускной в детском саду" loading="lazy">
-          </div>
-          <div class="case-info">
-            <h3>Выпускной в детском саду</h3>
-            <p>Организация праздника для 25 детей с аниматорами</p>
-          </div>
-        </div>
-        <div class="case-card">
-          <div class="case-image-container">
-            <img src="case3.jpg" alt="Новый год" loading="lazy">
-          </div>
-          <div class="case-info">
-            <h3>Корпоративный Новый год</h3>
-            <p>Праздник для детей сотрудников компании</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="reviews">
-    <div class="section-inner">
-      <h2>Отзывы</h2>
-      <p class="subtitle">Что говорят наши клиенты</p>
-      <div class="reviews-slider">
-        <div class="review-card">
-          <div class="review-header">
-            <div class="review-author">Марина К.</div>
-            <div class="review-rating">★★★★★</div>
-          </div>
-          <div class="review-text">
-            "Организация дня рождения дочери на высшем уровне! Дети в восторге, аниматоры профессиональные, все прошло без сучка и задоринки."
-          </div>
-          <div class="review-date">15.05.2023</div>
-        </div>
-        <div class="review-card">
-          <div class="review-header">
-            <div class="review-author">Александр П.</div>
-            <div class="review-rating">★★★★★</div>
-          </div>
-          <div class="review-text">
-            "Заказывали шоу мыльных пузырей на выпускной в садике. Все родители и дети остались в полном восторге!"
-          </div>
-          <div class="review-date">28.06.2023</div>
-        </div>
-        <div class="review-card">
-          <div class="review-header">
-            <div class="review-author">Ольга С.</div>
-            <div class="review-rating">★★★★★</div>
-          </div>
-          <div class="review-text">
-            "Прекрасная организация детского праздника! Все было на высшем уровне, дети в восторге!"
-          </div>
-          <div class="review-date">10.07.2023</div>
+        
+        <div class="load-more-container">
+          <button class="load-more-btn" id="load-more-reviews">
+            <span>Показать еще</span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
         </div>
       </div>
     </div>

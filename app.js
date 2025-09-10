@@ -419,7 +419,7 @@ app.post('/api/bookings', async (req, res) => {
     saveData();
     console.log(`New booking created: ${booking.id}`);
 
-    // Отправка email
+    // Отправка email клиенту
     if (email) {
       const emailKey = email.toLowerCase();
       emailCounts[emailKey] = (emailCounts[emailKey] || 0) + 1;
@@ -435,6 +435,14 @@ app.post('/api/bookings', async (req, res) => {
       } else {
         console.warn(`Email limit reached for ${email}`);
       }
+    }
+
+    // Отправка уведомления администратору (ВАМ)
+    try {
+      await sendAdminNotificationEmail(booking);
+      console.log(`Admin notification sent to ${process.env.ADMIN_EMAIL}`);
+    } catch (emailError) {
+      console.error('Admin email sending error:', emailError);
     }
 
     res.status(201).json({ 
@@ -475,7 +483,7 @@ app.get('/api/bookings', (req, res) => {
   });
 });
 
-// Функция отправки email
+// Функция отправки email клиенту
 async function sendConfirmationEmail(booking) {
   const mailOptions = {
     from: EMAIL_CONFIG.from,
@@ -491,6 +499,45 @@ async function sendConfirmationEmail(booking) {
         <li>Общая стоимость: ${booking.totalPrice} ₽</li>
       </ul>
       <p>Наш менеджер свяжется с вами в ближайшее время.</p>
+    `
+  };
+
+  await transporter.sendMail(mailOptions);
+}
+
+// Функция отправки email администратору (ВАМ)
+async function sendAdminNotificationEmail(booking) {
+  const adminEmail = process.env.ADMIN_EMAIL; // Ваш email куда приходят заявки
+
+  if (!adminEmail) {
+    console.warn('ADMIN_EMAIL not set, skipping admin notification');
+    return;
+  }
+
+  const mailOptions = {
+    from: EMAIL_CONFIG.from,
+    to: adminEmail, // Куда отправлять заявки (ВАШ email)
+    subject: `Новая заявка на праздник! #${booking.id}`,
+    html: `
+      <h1>Новая заявка на сайте!</h1>
+      <h2>Детали заявки:</h2>
+      <ul>
+        <li><strong>ID:</strong> ${booking.id}</li>
+        <li><strong>Имя:</strong> ${booking.name}</li>
+        <li><strong>Телефон:</strong> ${booking.phone}</li>
+        <li><strong>Email клиента:</strong> ${booking.email || 'не указан'}</li>
+        <li><strong>Дата мероприятия:</strong> ${new Date(booking.eventDate).toLocaleDateString()}</li>
+        <li><strong>День рождения ребенка:</strong> ${new Date(booking.childBirthday).toLocaleDateString()}</li>
+        <li><strong>Пакет:</strong> ${booking.packageType}</li>
+        <li><strong>Общая стоимость:</strong> ${booking.totalPrice} ₽</li>
+      </ul>
+      <h3>Выбранные услуги:</h3>
+      <p>Персонажи: ${booking.characters.map(c => c.name).join(', ') || 'нет'}</p>
+      <p>Шоу: ${booking.shows.map(s => s.name).join(', ') || 'нет'}</p>
+      <p>Мастер-классы: ${booking.masterClasses.map(m => m.name).join(', ') || 'нет'}</p>
+      <p>Доп. услуги: ${booking.additionalServices.map(a => a.name).join(', ') || 'нет'}</p>
+      <p><strong>IP адрес:</strong> ${booking.ip}</p>
+      <p><strong>Время заявки:</strong> ${new Date(booking.createdAt).toLocaleString()}</p>
     `
   };
 
