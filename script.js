@@ -482,6 +482,11 @@ document.addEventListener('DOMContentLoaded', function() {
   initProductButtons();
   initAdditionalServiceCheckboxes();
   initOrbitGallery();
+
+  // Поиск по персонажам и модалки
+  initCharacterSearch();
+  ensureImageModal();
+  ensureSuggestionModal();
 });
 
 function initIntersectionObserver() {
@@ -1613,6 +1618,208 @@ function initCarouselNavigation() {
   document.getElementById('master-next').addEventListener('click', () => scrollCarousel('master-slider', 220));
 }
 
+// Поиск по персонажам + карточка "Не нашли персонажа?"
+function initCharacterSearch() {
+  const charactersSlider = document.getElementById('characters-slider');
+  if (!charactersSlider) return;
+  // Не добавлять второй раз
+  if (document.querySelector('.characters-search')) return;
+
+  const searchWrap = document.createElement('div');
+  searchWrap.className = 'characters-search';
+  searchWrap.innerHTML = `
+    <input type="text" class="characters-search-input" placeholder="Поиск персонажей..." aria-label="Поиск персонажей">
+    <button type="button" class="search-clear" title="Очистить">×</button>
+  `;
+  charactersSlider.parentNode.insertBefore(searchWrap, charactersSlider);
+
+  const input = searchWrap.querySelector('.characters-search-input');
+  const clearBtn = searchWrap.querySelector('.search-clear');
+
+  const doFilter = () => {
+    const q = input.value.trim();
+    filterAndRenderCharacters(q);
+  };
+
+  input.addEventListener('input', doFilter);
+  clearBtn.addEventListener('click', () => {
+    input.value = '';
+    filterAndRenderCharacters('');
+    input.focus();
+  });
+}
+
+function filterAndRenderCharacters(query) {
+  const charactersSlider = document.getElementById('characters-slider');
+  if (!charactersSlider) return;
+
+  const norm = (s) => (s || '').toString().toLowerCase();
+  const q = norm(query);
+  const list = q ? charactersData.filter(c => norm(c.name).includes(q)) : charactersData.slice();
+
+  charactersSlider.innerHTML = '';
+
+  if (list.length === 0) {
+    const card = document.createElement('div');
+    card.className = 'character-card suggestion-card';
+    card.innerHTML = `
+      <div class="suggestion-content">
+        <div class="suggestion-emoji">✨</div>
+        <div class="suggestion-title">Не нашли персонажа?</div>
+        <div class="suggestion-text">Скажите, кого бы вы хотели видеть — мы обязательно учтём!</div>
+        <button class="suggestion-btn" type="button">Оставить пожелание</button>
+      </div>
+    `;
+    charactersSlider.appendChild(card);
+    const open = () => openSuggestionModal(query || '');
+    card.addEventListener('click', open);
+    card.querySelector('.suggestion-btn').addEventListener('click', (e) => { e.stopPropagation(); open(); });
+    return;
+  }
+
+  // Отрисовка карточек как в initSliders(), но по фильтру
+  list.forEach(character => {
+    const isSelected = selectedCharacters.some(c => c.name === character.name);
+    const card = document.createElement('div');
+    card.className = `character-card ${isSelected ? 'selected' : ''}`;
+    card.dataset.name = character.name;
+
+    let priceHtml = '';
+    if (currentPackage === 'custom') {
+      priceHtml = `<p class="price-tag">${CUSTOM_PRICES.character}₽</p>`;
+    }
+
+    card.innerHTML = `
+      <img src="${character.image}" alt="${character.name}">
+      <div class="character-info">
+        <h4>${character.name}</h4>
+        <p>${character.desc}</p>
+        ${priceHtml}
+      </div>
+    `;
+    charactersSlider.appendChild(card);
+  });
+
+  // Обработчики кликов только для персонажей (без дублирования для других секций)
+  document.querySelectorAll('#characters-slider .character-card').forEach(card => {
+    if (card.classList.contains('suggestion-card')) return;
+    card.addEventListener('click', function() {
+      const name = this.dataset.name;
+      const data = charactersData.find(c => c.name === name);
+      const index = selectedCharacters.findIndex(item => item.name === name);
+
+      if (index === -1) {
+        if (selectedCharacters.length < maxCharacters || currentPackage === 'custom') {
+          selectedCharacters.push({ name, price: data.price });
+          this.classList.add('selected');
+          showNotification(`Персонаж "${name}" добавлен`, 'success');
+        } else {
+          showNotification(`Можно выбрать не более ${maxCharacters} персонажей`, 'error');
+        }
+      } else {
+        selectedCharacters.splice(index, 1);
+        this.classList.remove('selected');
+      }
+      updateSelection();
+    });
+  });
+}
+
+// Модалка пожеланий по персонажу
+function ensureSuggestionModal() {
+  if (document.getElementById('suggestion-modal')) return;
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'suggestion-modal';
+  overlay.innerHTML = `
+    <div class="modal-content suggestion-modal">
+      <button class="close-modal" aria-label="Закрыть">×</button>
+      <h3 class="modal-title" style="text-align:center; margin-bottom: 16px;">Пожелание по персонажу</h3>
+      <form id="suggestion-form" class="suggestion-form">
+        <div class="form-group">
+          <label class="form-label" for="wish-name">Ваше имя</label>
+          <input id="wish-name" class="form-input" type="text" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="wish-date">Желаемая дата</label>
+          <input id="wish-date" class="form-input" type="date" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="wish-character">Какого персонажа хотите?</label>
+          <input id="wish-character" class="form-input" type="text" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="wish-reason">Почему именно он/она?</label>
+          <textarea id="wish-reason" class="form-textarea" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="form-submit">Отправить пожелание</button>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function openSuggestionModal(prefillCharacterName) {
+  ensureSuggestionModal();
+  const overlay = document.getElementById('suggestion-modal');
+  const form = overlay.querySelector('#suggestion-form');
+  overlay.classList.add('active');
+  overlay.querySelector('#wish-character').value = prefillCharacterName || '';
+
+  if (!form.dataset.bound) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        name: overlay.querySelector('#wish-name').value.trim(),
+        date: overlay.querySelector('#wish-date').value,
+        character: overlay.querySelector('#wish-character').value.trim(),
+        reason: overlay.querySelector('#wish-reason').value.trim()
+      };
+      try {
+        await fetch(`${API_BASE_URL}/character-requests`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {
+        console.warn('Не удалось отправить пожелание на сервер (офлайн):', err);
+      } finally {
+        showNotification('Спасибо! Мы учтём ваше пожелание.', 'success');
+        overlay.classList.remove('active');
+        form.reset();
+      }
+    });
+    form.dataset.bound = '1';
+  }
+}
+
+// Просмотр изображений отзыва на весь экран
+function ensureImageModal() {
+  if (document.getElementById('image-modal')) return;
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'image-modal';
+  overlay.innerHTML = `
+    <div class="modal-content image-modal">
+      <button class="close-modal" aria-label="Закрыть">×</button>
+      <img id="image-modal-img" alt="" style="max-width:100%; max-height: 80vh; display:block; margin: 0 auto; border-radius: 8px;">
+      <div id="image-modal-caption" class="image-caption"></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function openImageModal(src, caption) {
+  ensureImageModal();
+  const overlay = document.getElementById('image-modal');
+  const img = document.getElementById('image-modal-img');
+  const cap = document.getElementById('image-modal-caption');
+  img.src = src;
+  img.alt = caption || '';
+  cap.textContent = caption || '';
+  overlay.classList.add('active');
+}
+
 function showCaseModal(index) {
   // Реализация показа модального окна с кейсами
   console.log('Показать кейс', index);
@@ -1755,6 +1962,8 @@ function renderReviewPhotos() {
         </div>
       </div>
     `;
+    // Клик по карточке — открыть изображение на весь экран
+    photoCard.addEventListener('click', () => openImageModal(photo.image, photo.title || ''));
     reviewsGrid.appendChild(photoCard);
   });
 
