@@ -344,33 +344,6 @@ const showsData = [
     "image": "images/paper.jpg"
   },
   {
-    "name": "Крио-шоу с мороженым",
-    "desc": "Зрелищные эксперименты с холодом + мороженое для детей.",
-    "price": "1800 AED",
-    "age": "5-15 лет",
-    "duration": "45 минут",
-    "video": "https://daniliuskosmaches.github.io/videos/Icecream.mp4",
-    "image": "images/cryo.jpg"
-  },
-  {
-    "name": "Слайм шоу-мастерская",
-    "desc": "Создай свой слайм — яркие цвета, весёлое творчество.",
-    "price": "1000 AED (до 10 детей)",
-    "age": "5-10 лет",
-    "duration": "30-45 минут",
-    "video": "videos/slime-show.mov",
-    "image": "images/slime.jpg"
-  },
-  {
-    "name": "Мастерская блокнотов",
-    "desc": "Творческий мастер-класс по созданию блокнотов со стикерами и декором.",
-    "price": "1200 AED (до 10 детей)",
-    "age": "5-10 лет",
-    "duration": "30-45 минут",
-    "video": "https://daniliuskosmaches.github.io/videos/Notebook.mp4",
-    "image": "images/notebook.jpg"
-  },
-  {
     "name": "Пенная вечеринка",
     "desc": "Огромная пена, музыка и танцы в облаке пузырей.",
     "price": "2200 AED",
@@ -427,9 +400,30 @@ const showsData = [
 ];
 
 const masterClassesData = [
-  { name: "Создание костюмов", desc: "Научитесь создавать костюмы своими руками", price: 2500, icon: "✂️" },
-  { name: "Актерское мастерство", desc: "Основы перевоплощения в персонажей", price: 3000, icon: "🎭" },
-  { name: "Грим и макияж", desc: "Профессиональные техники грима", price: 2800, icon: "🎨" }
+  { 
+    name: "Крио-шоу с мороженым", 
+    desc: "Зрелищные эксперименты с холодом + мороженое для детей", 
+    price: 3500, 
+    icon: "🧊", 
+    image: "images/cryo.jpg",
+    video: "https://daniliuskosmaches.github.io/videos/Icecream.mp4"
+  },
+  { 
+    name: "Слайм шоу-мастерская", 
+    desc: "Создай свой слайм — яркие цвета, весёлое творчество", 
+    price: 3000, 
+    icon: "🧪",
+    image: "images/slime.jpg",
+    video: "videos/slime-show.mov"
+  },
+  { 
+    name: "Мастерская блокнотов", 
+    desc: "Творческий мастер-класс по созданию блокнотов со стикерами и декором", 
+    price: 3000, 
+    icon: "📓",
+    image: "images/notebook.jpg",
+    video: "https://daniliuskosmaches.github.io/videos/Notebook.mp4"
+  }
 ];
 
 let currentPackage = null;
@@ -587,11 +581,23 @@ function initSliders() {
       priceHtml = `<p class="price-tag">${CUSTOM_PRICES.master}₽</p>`;
     }
 
+    // Теперь у мастер-классов есть изображения
+    const imageHtml = master.image 
+      ? `<img src="${master.image}" alt="${master.name}">`
+      : `<div class="master-icon">${master.icon}</div>`;
+
+    const viewBtnHtml = master.video 
+      ? `<button class="view-btn" data-video="${master.video}" data-name="${master.name}">Посмотреть</button>` 
+      : '';
+
     card.innerHTML = `
-      <div class="master-icon">${master.icon}</div>
-      <h4>${master.name}</h4>
-      <p>${master.desc}</p>
-      ${priceHtml}
+      ${imageHtml}
+      <div class="master-info">
+        <h4>${master.name}</h4>
+        <p>${master.desc}</p>
+        ${priceHtml}
+        ${viewBtnHtml}
+      </div>
     `;
     masterSlider.appendChild(card);
   });

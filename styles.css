@@ -862,8 +862,17 @@ h2:after {
   transition: all 0.3s ease;
 }
 
+.master-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
 .master-info,
-.price-tag {
+.price-tag,
+.master-card .view-btn {
   opacity: 0;
   position: absolute;
   transition: all 0.3s ease;
@@ -872,10 +881,10 @@ h2:after {
 
 .master-card:hover,
 .master-card.selected {
-  width: 220px;
-  height: 300px;
+  width: 280px; /* Увеличиваем ширину как у шоу-карточек */
+  height: 380px; /* Увеличиваем высоту как у шоу-карточек */
   border-radius: 12px;
-  padding: 15px;
+  padding: 20px;
   background: rgba(214, 196, 155, 0.1);
   border: 1px solid var(--accent-color);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -883,11 +892,19 @@ h2:after {
 
 .master-card:hover .master-icon,
 .master-card.selected .master-icon {
-  width: 120px;
-  height: 120px;
-  margin-bottom: 15px;
-  font-size: 2.5rem;
+  width: 150px; /* Увеличиваем размер иконки */
+  height: 150px;
+  margin-bottom: 20px;
+  font-size: 3rem;
   background: transparent;
+}
+
+.master-card:hover img,
+.master-card.selected img {
+  width: 150px;
+  height: 150px;
+  margin-bottom: 20px;
+  border-radius: 50%;
 }
 
 .master-card:hover h4,
@@ -895,10 +912,36 @@ h2:after {
 .master-card:hover p,
 .master-card.selected p,
 .master-card:hover .price-tag,
-.master-card.selected .price-tag {
+.master-card.selected .price-tag,
+.master-card:hover .view-btn,
+.master-card.selected .view-btn {
   opacity: 1;
   position: static;
   pointer-events: auto;
+}
+
+/* Стили для кнопки просмотра видео в мастер-классах */
+.master-card .view-btn {
+  display: block;
+  margin-top: 15px;
+  background: var(--accent-color);
+  color: var(--bg-color);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  width: 100%;
+  text-align: center;
+}
+
+.master-card .view-btn:hover {
+  background: var(--highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
 .character-card.selected:after, 
