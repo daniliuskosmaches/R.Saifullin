@@ -1622,19 +1622,11 @@ function initCarouselNavigation() {
 function initCharacterSearch() {
   const charactersSlider = document.getElementById('characters-slider');
   if (!charactersSlider) return;
-  // Не добавлять второй раз
-  if (document.querySelector('.characters-search')) return;
 
-  const searchWrap = document.createElement('div');
-  searchWrap.className = 'characters-search';
-  searchWrap.innerHTML = `
-    <input type="text" class="characters-search-input" placeholder="Поиск персонажей..." aria-label="Поиск персонажей">
-    <button type="button" class="search-clear" title="Очистить">×</button>
-  `;
-  charactersSlider.parentNode.insertBefore(searchWrap, charactersSlider);
+  const input = document.querySelector('.characters-search-input');
+  const clearBtn = document.querySelector('.search-clear');
 
-  const input = searchWrap.querySelector('.characters-search-input');
-  const clearBtn = searchWrap.querySelector('.search-clear');
+  if (!input || !clearBtn) return;
 
   const doFilter = () => {
     const q = input.value.trim();
@@ -1727,96 +1719,65 @@ function filterAndRenderCharacters(query) {
 
 // Модалка пожеланий по персонажу
 function ensureSuggestionModal() {
-  if (document.getElementById('suggestion-modal')) return;
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.id = 'suggestion-modal';
-  overlay.innerHTML = `
-    <div class="modal-content suggestion-modal">
-      <button class="close-modal" aria-label="Закрыть">×</button>
-      <h3 class="modal-title" style="text-align:center; margin-bottom: 16px;">Пожелание по персонажу</h3>
-      <form id="suggestion-form" class="suggestion-form">
-        <div class="form-group">
-          <label class="form-label" for="wish-name">Ваше имя</label>
-          <input id="wish-name" class="form-input" type="text" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="wish-date">Желаемая дата</label>
-          <input id="wish-date" class="form-input" type="date" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="wish-character">Какого персонажа хотите?</label>
-          <input id="wish-character" class="form-input" type="text" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="wish-reason">Почему именно он/она?</label>
-          <textarea id="wish-reason" class="form-textarea" rows="4" required></textarea>
-        </div>
-        <button type="submit" class="form-submit">Отправить пожелание</button>
-      </form>
-    </div>
-  `;
-  document.body.appendChild(overlay);
+  const overlay = document.getElementById('suggestion-modal');
+  if (!overlay) return;
+
+  // Если событие еще не было добавлено
+  const form = overlay.querySelector('#suggestion-form');
+  if (!form || form.dataset.bound) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+      name: overlay.querySelector('#wish-name').value.trim(),
+      date: overlay.querySelector('#wish-date').value,
+      character: overlay.querySelector('#wish-character').value.trim(),
+      reason: overlay.querySelector('#wish-reason').value.trim()
+    };
+    try {
+      await fetch(`${API_BASE_URL}/character-requests`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch (err) {
+      console.warn('Не удалось отправить пожелание на сервер (офлайн):', err);
+    } finally {
+      showNotification('Спасибо! Мы учтём ваше пожелание.', 'success');
+      overlay.classList.remove('active');
+      form.reset();
+    }
+  });
+  form.dataset.bound = '1';
 }
 
 function openSuggestionModal(prefillCharacterName) {
   ensureSuggestionModal();
   const overlay = document.getElementById('suggestion-modal');
-  const form = overlay.querySelector('#suggestion-form');
-  overlay.classList.add('active');
-  overlay.querySelector('#wish-character').value = prefillCharacterName || '';
+  if (!overlay) return; // Предотвращаем ошибки
 
-  if (!form.dataset.bound) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const payload = {
-        name: overlay.querySelector('#wish-name').value.trim(),
-        date: overlay.querySelector('#wish-date').value,
-        character: overlay.querySelector('#wish-character').value.trim(),
-        reason: overlay.querySelector('#wish-reason').value.trim()
-      };
-      try {
-        await fetch(`${API_BASE_URL}/character-requests`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-      } catch (err) {
-        console.warn('Не удалось отправить пожелание на сервер (офлайн):', err);
-      } finally {
-        showNotification('Спасибо! Мы учтём ваше пожелание.', 'success');
-        overlay.classList.remove('active');
-        form.reset();
-      }
-    });
-    form.dataset.bound = '1';
-  }
+  const charInput = overlay.querySelector('#wish-character');
+  if (charInput) charInput.value = prefillCharacterName || '';
+
+  overlay.classList.add('active');
 }
 
 // Просмотр изображений отзыва на весь экран
 function ensureImageModal() {
-  if (document.getElementById('image-modal')) return;
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.id = 'image-modal';
-  overlay.innerHTML = `
-    <div class="modal-content image-modal">
-      <button class="close-modal" aria-label="Закрыть">×</button>
-      <img id="image-modal-img" alt="" style="max-width:100%; max-height: 80vh; display:block; margin: 0 auto; border-radius: 8px;">
-      <div id="image-modal-caption" class="image-caption"></div>
-    </div>
-  `;
-  document.body.appendChild(overlay);
+  // Просто проверяем, что модалка есть в HTML
+  return document.getElementById('image-modal') !== null;
 }
 
 function openImageModal(src, caption) {
   ensureImageModal();
   const overlay = document.getElementById('image-modal');
+  if (!overlay) return; // Предотвращаем ошибки
+
   const img = document.getElementById('image-modal-img');
   const cap = document.getElementById('image-modal-caption');
-  img.src = src;
-  img.alt = caption || '';
-  cap.textContent = caption || '';
+  if (img) img.src = src || '';
+  if (img) img.alt = caption || '';
+  if (cap) cap.textContent = caption || '';
   overlay.classList.add('active');
 }
 

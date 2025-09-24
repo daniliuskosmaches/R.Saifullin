@@ -139,6 +139,11 @@
         </div>
         <div class="selection-section">
           <h3 class="selection-section-title">Персонажи <span class="selected-count" id="characters-count">0</span>/<span id="max-characters">1</span></h3>
+          <!-- Поле поиска персонажей -->
+          <div class="characters-search">
+            <input type="text" class="characters-search-input" placeholder="Поиск персонажей..." aria-label="Поиск персонажей">
+            <button type="button" class="search-clear" title="Очистить">×</button>
+          </div>
           <div class="selection-navigation">
             <button class="carousel-nav prev" id="characters-prev">❮</button>
             <div class="character-carousel-container">
@@ -328,6 +333,42 @@
         </video>
         <div id="video-modal-title" class="video-title"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно для просмотра изображений отзывов -->
+  <div class="modal-overlay" id="image-modal">
+    <div class="modal-content image-modal">
+      <button class="close-modal">&times;</button>
+      <img id="image-modal-img" src="" alt="" style="max-width:100%; max-height: 80vh; display:block; margin: 0 auto; border-radius: 8px;">
+      <div id="image-modal-caption" class="image-caption"></div>
+    </div>
+  </div>
+
+  <!-- Модальное окно для пожеланий по персонажам -->
+  <div class="modal-overlay" id="suggestion-modal">
+    <div class="modal-content suggestion-modal">
+      <button class="close-modal">&times;</button>
+      <h3 class="modal-title" style="text-align:center; margin-bottom: 16px;">Пожелание по персонажу</h3>
+      <form id="suggestion-form" class="suggestion-form">
+        <div class="form-group">
+          <label class="form-label" for="wish-name">Ваше имя</label>
+          <input id="wish-name" class="form-input" type="text" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="wish-date">Желаемая дата</label>
+          <input id="wish-date" class="form-input" type="date" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="wish-character">Какого персонажа хотите?</label>
+          <input id="wish-character" class="form-input" type="text" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="wish-reason">Почему именно он/она?</label>
+          <textarea id="wish-reason" class="form-textarea" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="form-submit">Отправить пожелание</button>
+      </form>
     </div>
   </div>
 
