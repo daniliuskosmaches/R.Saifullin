@@ -137,34 +137,38 @@
           <h3>Выбран пакет: <span id="selected-package-name">Базовый</span></h3>
           <div class="total-price">Итого: <span id="total-price">10 000</span> ₽</div>
         </div>
+        <!-- Поиск персонажей -->
+        <div class="character-search-container">
+          <input type="text" id="character-search-input" class="form-input" placeholder="Поиск персонажа...">
+        </div>
         <div class="selection-section">
           <h3 class="selection-section-title">Персонажи <span class="selected-count" id="characters-count">0</span>/<span id="max-characters">1</span></h3>
-          <div class="selection-navigation">
-            <button class="carousel-nav prev" id="characters-prev">❮</button>
-            <div class="character-carousel-container">
-              <div class="character-carousel" id="characters-slider"></div>
-            </div>
-            <button class="carousel-nav next" id="characters-next">❯</button>
+          <div class="character-carousel" id="characters-slider"></div>
+          <div class="load-more-container">
+            <button class="load-more-btn" id="load-more-characters" style="display:none;">
+              <span>Показать ещё</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
           </div>
         </div>
         <div class="selection-section">
           <h3 class="selection-section-title">Шоу-программы <span class="selected-count" id="shows-count">0</span>/<span id="max-shows">0</span></h3>
-          <div class="selection-navigation">
-            <button class="carousel-nav prev" id="shows-prev">❮</button>
-            <div class="show-carousel-container">
-              <div class="show-carousel" id="shows-slider"></div>
-            </div>
-            <button class="carousel-nav next" id="shows-next">❯</button>
+          <div class="show-carousel" id="shows-slider"></div>
+          <div class="load-more-container">
+            <button class="load-more-btn" id="load-more-shows" style="display:none;">
+              <span>Показать ещё</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
           </div>
         </div>
         <div class="selection-section">
           <h3 class="selection-section-title">Мастер-классы <span class="selected-count" id="master-count">0</span>/<span id="max-master">1</span></h3>
-          <div class="selection-navigation">
-            <button class="carousel-nav prev" id="master-prev">❮</button>
-            <div class="master-carousel-container">
-              <div class="master-carousel" id="master-slider"></div>
-            </div>
-            <button class="carousel-nav next" id="master-next">❯</button>
+          <div class="master-carousel" id="master-slider"></div>
+          <div class="load-more-container">
+            <button class="load-more-btn" id="load-more-master" style="display:none;">
+              <span>Показать ещё</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
           </div>
         </div>
         <div class="selected-services-preview" id="selected-services"></div>
@@ -181,7 +185,7 @@
       <p class="subtitle">Реальные фото с мероприятий</p>
       
       <div class="reviews-container">
-        <div class="reviews-grid" id="reviews-grid">
+        <div class="reviews-grid" id="reviews-slider">
           <!-- Фотографии будут загружены через JavaScript -->
         </div>
         
@@ -331,6 +335,35 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <!-- Модальное окно для пожелания персонажа -->
+  <div class="modal-overlay" id="wish-character-modal">
+    <div class="modal-content">
+      <button class="close-modal">&times;</button>
+      <div class="modal-body">
+        <h3>Какого персонажа вы бы хотели увидеть?</h3>
+        <form id="wish-character-form">
+          <div class="form-group">
+            <label for="wish-name" class="form-label">Ваше имя</label>
+            <input type="text" id="wish-name" name="wish-name" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label for="wish-character" class="form-label">Желаемый персонаж</label>
+            <input type="text" id="wish-character" name="wish-character" class="form-input" required>
+          </div>
+          <button type="submit" class="form-submit">Отправить</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно для просмотра фото/видео отзыва -->
+  <div class="modal-overlay" id="review-media-modal">
+    <div class="modal-content">
+      <button class="close-modal">&times;</button>
+      <div class="modal-body" id="review-media-modal-body"></div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
