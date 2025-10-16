@@ -314,7 +314,7 @@ export const showsData = [
     "age": "5-12 лет",
     "duration": "30 минут",
     "video": "https://daniliuskosmaches.github.io/videos/videos/Bubble.mp4",
-    "image": "images/bubble.jpg"
+    "image": "images/Foam0.jpg"
   },
   {
     "name": "Химическое шоу",
