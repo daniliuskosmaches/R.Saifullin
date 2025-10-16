@@ -1,7 +1,7 @@
 :root {
-  --bg-color: #1e3a2f;
-  --text-color: #d6c49b;
-  --accent-color: #d6c49b;
+  --bg-color: #509570;
+  --text-color: #e1c58a;
+  --accent-color: #e1c58a;
   --hover-color: #e6d3a4;
   --button-bg: #1e3a2f;
   --cta-color: #d6c49b;
@@ -240,7 +240,7 @@ nav {
   justify-content: center;
   padding: 15px 30px;
   background: transparent;
-  color: var(--text-color);
+  color: #070a0c;
   border: 2px solid var(--accent-color);
   font-size: 1rem;
   font-weight: bold;
@@ -1394,7 +1394,7 @@ h2:after {
   padding: 12px;
   border: 1px solid #e9dada;
   background: rgba(50, 83, 19, 0.466);
-  color: var(--bg-color);
+  color: #e9dada;
   font-family: inherit;
   font-size: 1rem;
   border-radius: 6px;

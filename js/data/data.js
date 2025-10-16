@@ -422,7 +422,7 @@ export const showsData = [
     "age": "12-18 лет",
     "duration": "60 минут",
     "video": "videos/teen.mp4",
-    "image": "images/default-show.jpg"
+    "image": "images/Teen.jpg"
   }
 ];
 
